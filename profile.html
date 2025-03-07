@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>수행평가 알리미 - 내 프로필</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pretendard 폰트 -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css"
+    />
+    <!-- Font Awesome 아이콘 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+          "Noto Sans KR", "Malgun Gothic", sans-serif;
+      }
+      /* 모바일 하단 네비게이션 바를 위한 여백 */
+      .mobile-nav-padding {
+        padding-bottom: 4rem;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              secondary: "#10B981",
+              accent: "#F59E0B",
+              danger: "#EF4444",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gray-50 min-h-screen mobile-nav-padding">
+    <!-- 헤더 - 데스크톱에서만 표시 -->
+    <header class="bg-white shadow-sm hidden md:block">
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a href="index.html" class="text-gray-600 hover:text-primary"
+                >홈</a
+              >
+            </li>
+            <li>
+              <a href="alerts.html" class="text-gray-600 hover:text-primary"
+                >알리미</a
+              >
+            </li>
+            <li>
+              <a href="profile.html" class="text-primary font-medium"
+                >내 정보</a
+              >
+            </li>
+            <li>
+              <a href="login.html" class="text-gray-600 hover:text-primary"
+                >로그인</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- 모바일 헤더 - 모바일에서만 표시 -->
+    <header class="bg-white shadow-sm md:hidden">
+      <div class="container mx-auto px-4 py-4 flex justify-center items-center">
+        <h1 class="text-xl font-bold text-primary">내 정보</h1>
+      </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- 프로필 정보 섹션 -->
+      <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex flex-col md:flex-row items-center md:items-start">
+          <div class="flex-1 text-center md:text-left">
+            <h2 id="user-name" class="text-2xl font-bold mb-2">사용자</h2>
+            <p id="user-school-info" class="text-gray-600 mb-4">학교 정보</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 설정 섹션 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold mb-4">계정 설정</h3>
+
+          <!-- 알림 설정 -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold mb-3">알림 설정</h4>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">이메일 알림</p>
+                  <p class="text-sm text-gray-600">
+                    수행평가 마감일에 이메일로 알림을 받습니다.
+                  </p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value=""
+                    class="sr-only peer"
+                    checked
+                  />
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+                  ></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">푸시 알림</p>
+                  <p class="text-sm text-gray-600">
+                    수행평가 마감 하루 전에 푸시 알림을 받습니다.
+                  </p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value=""
+                    class="sr-only peer"
+                    checked
+                  />
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+                  ></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">주간 요약</p>
+                  <p class="text-sm text-gray-600">
+                    매주 일요일에 다음 주 수행평가 요약을 받습니다.
+                  </p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" value="" class="sr-only peer" />
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+                  ></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 계정 정보 -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold mb-3">계정 정보</h4>
+            <form id="account-form">
+              <div class="mb-4">
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >이메일</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                />
+              </div>
+              <div class="mb-4">
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >비밀번호 변경</label
+                >
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="새 비밀번호"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary mb-2"
+                  minlength="6"
+                />
+                <input
+                  type="password"
+                  id="password-confirm"
+                  placeholder="비밀번호 확인"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary mb-2"
+                  minlength="6"
+                />
+                <p class="text-xs text-gray-500">비밀번호는 최소 6자 이상이어야 합니다.</p>
+                <div id="password-feedback" class="text-sm mt-1 hidden"></div>
+              </div>
+              <button
+                type="submit"
+                class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
+              >
+                저장
+              </button>
+            </form>
+          </div>
+
+          <!-- 데이터 관리 -->
+          <div>
+            <h4 class="text-md font-semibold mb-3">데이터 관리</h4>
+            <div class="space-y-3">
+              <button id="delete-account-btn" class="text-white bg-danger hover:bg-red-600 px-4 py-2 rounded-md transition flex items-center">
+                <i class="fas fa-trash-alt mr-2"></i> 계정 삭제
+              </button>
+              <p class="text-sm text-gray-600 mt-2">
+                계정을 삭제하면 모든 데이터가 영구적으로 제거되며 이 작업은 되돌릴 수 없습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class=" text-white hidden md:block">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+          </div>
+          <div>
+            <p class="text-sm text-black">
+              &copy; 2025 수행평가 알리미. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 모바일 하단 네비게이션 바 -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200"
+    >
+      <div class="flex justify-around">
+        <a
+          href="index.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-home text-xl mb-1"></i>
+          <span class="text-xs">홈</span>
+        </a>
+        <a
+          href="alerts.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-clipboard-list text-xl mb-1"></i>
+          <span class="text-xs">알리미</span>
+        </a>
+        <a
+          href="profile.html"
+          class="flex flex-col items-center py-2 px-3 text-primary"
+        >
+          <i class="fas fa-user text-xl mb-1"></i>
+          <span class="text-xs">내 정보</span>
+        </a>
+        <a
+          href="login.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-sign-in-alt text-xl mb-1"></i>
+          <span class="text-xs">로그인</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- 자바스크립트 -->
+    <script>
+      // API 기본 URL
+      const API_BASE_URL = "http://localhost:5000/api";
+      
+      // 전역 변수
+      let isLoggedIn = false;
+      let currentUser = null;
+      
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("프로필 페이지가 로드되었습니다.");
+        
+        // 로그인 상태 확인
+        checkLoginStatus();
+        
+        // 계정 정보 폼 제출 처리
+        const accountForm = document.getElementById("account-form");
+        if (accountForm) {
+          accountForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            
+            // 폼 데이터 수집
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const passwordConfirm = document.getElementById("password-confirm").value;
+            const passwordFeedback = document.getElementById("password-feedback");
+            
+            // 비밀번호 유효성 검사
+            if (password) {
+              if (password.length < 6) {
+                passwordFeedback.textContent = "비밀번호는 최소 6자 이상이어야 합니다.";
+                passwordFeedback.className = "text-sm mt-1 text-danger";
+                passwordFeedback.classList.remove("hidden");
+                return;
+              }
+              
+              if (password !== passwordConfirm) {
+                passwordFeedback.textContent = "비밀번호가 일치하지 않습니다.";
+                passwordFeedback.className = "text-sm mt-1 text-danger";
+                passwordFeedback.classList.remove("hidden");
+                return;
+              }
+            }
+            
+            // 비밀번호 피드백 초기화
+            passwordFeedback.classList.add("hidden");
+            
+            // 계정 정보 업데이트
+            updateAccountInfo(email, password)
+              .then(() => {
+                // 성공 메시지 표시
+                passwordFeedback.textContent = "계정 정보가 성공적으로 업데이트되었습니다.";
+                passwordFeedback.className = "text-sm mt-1 text-green-600";
+                passwordFeedback.classList.remove("hidden");
+                
+                // 비밀번호 필드 초기화
+                document.getElementById("password").value = "";
+                document.getElementById("password-confirm").value = "";
+                
+                // 3초 후 메시지 숨기기
+                setTimeout(() => {
+                  passwordFeedback.classList.add("hidden");
+                }, 3000);
+              })
+              .catch(error => {
+                console.error("계정 정보 업데이트 오류:", error);
+                passwordFeedback.textContent = `오류: ${error.message || "계정 정보 업데이트 중 오류가 발생했습니다."}`;
+                passwordFeedback.className = "text-sm mt-1 text-danger";
+                passwordFeedback.classList.remove("hidden");
+              });
+          });
+        }
+        
+        // 계정 삭제 버튼 이벤트 리스너 추가
+        const deleteAccountBtn = document.getElementById("delete-account-btn");
+        if (deleteAccountBtn) {
+          deleteAccountBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            deleteAccount();
+          });
+        }
+      });
+      
+      // 로그인 상태 확인 및 UI 업데이트
+      function checkLoginStatus() {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+        
+        if (token && userStr) {
+          try {
+            // 사용자 정보 파싱
+            currentUser = JSON.parse(userStr);
+            isLoggedIn = true;
+            
+            // 계정 정보 업데이트
+            updateAccountUI();
+          } catch (error) {
+            console.error('사용자 정보 파싱 오류:', error);
+            // 오류 발생 시 로그인 페이지로 리다이렉트
+            window.location.href = 'login.html';
+          }
+        } else {
+          // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+          window.location.href = 'login.html';
+        }
+      }
+      
+      // 계정 정보 UI 업데이트
+      function updateAccountUI() {
+        if (!currentUser) return;
+        
+        // 사용자 이름 및 학교 정보 업데이트
+        const nameElement = document.getElementById('user-name');
+        const schoolInfoElement = document.getElementById('user-school-info');
+        
+        if (nameElement) {
+          nameElement.textContent = currentUser.name || '사용자';
+        }
+        
+        if (schoolInfoElement) {
+          let schoolText = currentUser.school || '';
+          let gradeText = '';
+          let classText = '';
+          
+          // 학년 정보 변환 (grade1 -> 1학년)
+          if (currentUser.grade) {
+            const gradeMatch = currentUser.grade.match(/grade(\d+)/);
+            if (gradeMatch) {
+              gradeText = gradeMatch[1] + '학년';
+            }
+          }
+          
+          // 반 정보 변환 (class2 -> 2반)
+          if (currentUser.class) {
+            const classMatch = currentUser.class.match(/class(\d+)/);
+            if (classMatch) {
+              classText = classMatch[1] + '반';
+            }
+          }
+          
+          schoolInfoElement.textContent = `${schoolText} ${gradeText} ${classText}`.trim();
+        }
+        
+        // 이메일 필드 업데이트
+        const emailInput = document.getElementById('email');
+        if (emailInput && currentUser.email) {
+          emailInput.value = currentUser.email;
+        }
+        
+        // 로그인/로그아웃 버튼 업데이트
+        updateLoginLogoutButtons();
+      }
+      
+      // 로그인/로그아웃 버튼 업데이트
+      function updateLoginLogoutButtons() {
+        // 데스크톱 네비게이션 업데이트
+        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        if (desktopNav) {
+          const loginLi = desktopNav.querySelector('li:last-child');
+          if (loginLi) {
+            loginLi.innerHTML = `
+              <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
+            `;
+            
+            // 로그아웃 버튼 이벤트 추가
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+              logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+              });
+            }
+          }
+        }
+        
+        // 모바일 네비게이션 업데이트
+        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        if (mobileNav) {
+          const loginLink = mobileNav.querySelector('a:last-child');
+          if (loginLink) {
+            loginLink.href = '#';
+            
+            const icon = loginLink.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-sign-in-alt');
+              icon.classList.add('fa-sign-out-alt');
+            }
+            
+            const span = loginLink.querySelector('span');
+            if (span) {
+              span.textContent = '로그아웃';
+            }
+            
+            // 로그아웃 이벤트 추가
+            loginLink.addEventListener('click', function(e) {
+              e.preventDefault();
+              logout();
+            });
+          }
+        }
+      }
+      
+      // 로그아웃 처리
+      function logout() {
+        // 로컬 스토리지에서 토큰 및 사용자 정보 제거
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // 로그인 페이지로 리다이렉트
+        window.location.href = 'login.html';
+      }
+      
+      // 계정 정보 업데이트 API 호출
+      async function updateAccountInfo(email, password) {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('로그인이 필요합니다.');
+          }
+          
+          const data = {};
+          if (email) data.email = email;
+          if (password) data.password = password;
+          
+          const response = await fetch(`${API_BASE_URL}/users/account`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+          });
+          
+          if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.message || '계정 정보 업데이트에 실패했습니다.');
+          }
+          
+          // 이메일이 변경된 경우 사용자 정보 업데이트
+          if (email && currentUser) {
+            currentUser.email = email;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+          }
+          
+          return await response.json();
+        } catch (error) {
+          console.error('계정 정보 업데이트 API 오류:', error);
+          throw error;
+        }
+      }
+
+      // 계정 삭제 기능 구현
+      async function deleteAccount() {
+        try {
+          // 사용자 확인
+          const confirmed = confirm("정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+          if (!confirmed) return;
+          
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('로그인이 필요합니다.');
+          }
+          
+          const response = await fetch(`${API_BASE_URL}/users/account`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            const responseData = await response.json();
+            throw new Error(responseData.message || '계정 삭제에 실패했습니다.');
+          }
+          
+          // 로컬 스토리지 정보 삭제
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('rememberMe');
+          
+          alert('계정이 성공적으로 삭제되었습니다.');
+          
+          // 로그인 페이지로 리다이렉트
+          window.location.href = 'login.html';
+        } catch (error) {
+          console.error('계정 삭제 API 오류:', error);
+          alert(`계정 삭제 중 오류가 발생했습니다: ${error.message}`);
+        }
+      }
+    </script>
+  </body>
+</html>

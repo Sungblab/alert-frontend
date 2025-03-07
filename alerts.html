@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>수행평가 알리미 - 알림 관리</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pretendard 폰트 -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css"
+    />
+    <!-- Font Awesome 아이콘 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+          "Noto Sans KR", "Malgun Gothic", sans-serif;
+      }
+      /* 모바일 하단 네비게이션 바를 위한 여백 */
+      .mobile-nav-padding {
+        padding-bottom: 4rem;
+      }
+      /* 탭 스타일 */
+      .tab-active {
+        color: #4f46e5;
+        border-bottom: 2px solid #4f46e5;
+      }
+      /* 태그 스타일 */
+      .tag {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+      .tag-math {
+        background-color: #dbeafe;
+        color: #1e40af;
+      }
+      .tag-korean {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+      .tag-english {
+        background-color: #dcfce7;
+        color: #166534;
+      }
+      .tag-science {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .tag-social {
+        background-color: #e0e7ff;
+        color: #3730a3;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              secondary: "#10B981",
+              accent: "#F59E0B",
+              danger: "#EF4444",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gray-50 min-h-screen mobile-nav-padding">
+    <!-- 헤더 - 데스크톱에서만 표시 -->
+    <header class="bg-white shadow-sm hidden md:block">
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a href="index.html" class="text-gray-600 hover:text-primary"
+                >홈</a
+              >
+            </li>
+            <li>
+              <a href="alerts.html" class="text-primary font-medium">알리미</a>
+            </li>
+            <li>
+              <a href="profile.html" class="text-gray-600 hover:text-primary"
+                >내 정보</a
+              >
+            </li>
+            <li>
+              <a href="login.html" class="text-gray-600 hover:text-primary"
+                >로그인</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- 모바일 헤더 - 모바일에서만 표시 -->
+    <header class="bg-white shadow-sm md:hidden">
+      <div class="container mx-auto px-4 py-4 flex justify-center items-center">
+        <h1 class="text-xl font-bold text-primary">알림 관리</h1>
+      </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- 알림 관리 섹션 -->
+      <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold">알림 관리</h2>
+          <button
+            id="create-alert-btn"
+            class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition flex items-center"
+          >
+            <i class="fas fa-plus mr-2"></i> 새 알림 만들기
+          </button>
+        </div>
+
+        <!-- 필터 및 검색 -->
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
+          <div class="flex-1">
+            <label
+              for="filter-date"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >날짜 필터</label
+            >
+            <select
+              id="filter-date"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            >
+              <option value="all">모든 날짜</option>
+              <option value="today">오늘</option>
+              <option value="week">이번 주</option>
+              <option value="month">이번 달</option>
+            </select>
+          </div>
+          <div class="flex-1">
+            <label
+              for="search-alert"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >검색</label
+            >
+            <div class="relative">
+              <input
+                type="text"
+                id="search-alert"
+                placeholder="알림 검색..."
+                class="w-full p-2 pl-10 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              />
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 알림 목록 -->
+        <div class="space-y-4" id="alerts-container">
+          <!-- 알림이 없을 경우 표시될 메시지 -->
+          <div id="no-alerts-message" class="text-center py-8 text-gray-500 hidden">
+            등록된 알림이 없습니다.
+          </div>
+
+          <!-- 로딩 표시 -->
+          <div id="alerts-loading" class="text-center py-8">
+            <i class="fas fa-spinner fa-spin text-primary mr-2"></i> 알림을 불러오는 중...
+          </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="flex justify-center mt-8">
+          <nav class="inline-flex rounded-md shadow" id="pagination-container">
+            <!-- 페이지네이션 버튼이 여기에 동적으로 생성됩니다 -->
+          </nav>
+        </div>
+      </section>
+
+      <!-- 새 알림 생성 모달 -->
+      <div
+        id="create-alert-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+      >
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">새 알림 만들기</h3>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <form id="create-alert-form">
+            <div class="mb-4">
+              <label
+                for="alert-title"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >제목</label
+              >
+              <input
+                type="text"
+                id="alert-title"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                placeholder="알림 제목을 입력하세요"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="alert-date"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >마감일</label
+              >
+              <input
+                type="date"
+                id="alert-date"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="alert-description"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >설명</label
+              >
+              <textarea
+                id="alert-description"
+                rows="4"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                placeholder="알림에 대한 자세한 설명을 입력하세요"
+                required
+              ></textarea>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >알림 옵션</label
+              >
+              <div class="flex items-center">
+                <input type="checkbox" id="alert-notify" class="mr-2" />
+                <label for="alert-notify" class="text-sm text-gray-700"
+                  >마감일에 알림 받기</label
+                >
+              </div>
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button
+                type="button"
+                id="cancel-alert"
+                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-primary text-white rounded-md hover:bg-indigo-600"
+              >
+                저장
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 알림 상세 보기 모달 -->
+      <div
+        id="alert-detail-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+      >
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="modal-alert-title" class="text-lg font-semibold">알림 제목</h3>
+            <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <i class="far fa-calendar-alt text-gray-500 mr-2"></i>
+                <span id="modal-alert-date" class="text-sm text-gray-600">날짜</span>
+              </div>
+              <div id="modal-alert-author" class="text-sm text-gray-500"></div>
+            </div>
+            <div class="border-t border-gray-200 pt-3 mt-2">
+              <p id="modal-alert-description" class="text-gray-700">알림 내용</p>
+            </div>
+          </div>
+          <div class="flex justify-end space-x-2">
+            <button
+              id="modal-edit-btn"
+              class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+            >
+              <i class="far fa-edit mr-1"></i> 수정
+            </button>
+            <button
+              id="modal-delete-btn"
+              class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+            >
+              <i class="far fa-trash-alt mr-1"></i> 삭제
+            </button>
+            <button
+              id="modal-share-btn"
+              class="px-3 py-1 bg-primary text-white rounded-md hover:bg-indigo-600 text-sm"
+            >
+              <i class="far fa-share-square mr-1"></i> 공유
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class=" text-white hidden md:block">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+          </div>
+          <div>
+            <p class="text-sm text-black">
+              &copy; 2025 수행평가 알리미. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 모바일 하단 네비게이션 바 -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200"
+    >
+      <div class="flex justify-around">
+        <a
+          href="index.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-home text-xl mb-1"></i>
+          <span class="text-xs">홈</span>
+        </a>
+        <a
+          href="alerts.html"
+          class="flex flex-col items-center py-2 px-3 text-primary"
+        >
+          <i class="fas fa-clipboard-list text-xl mb-1"></i>
+          <span class="text-xs">알리미</span>
+        </a>
+        <a
+          href="profile.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-user text-xl mb-1"></i>
+          <span class="text-xs">내 정보</span>
+        </a>
+        <a
+          href="login.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-sign-in-alt text-xl mb-1"></i>
+          <span class="text-xs">로그인</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- 자바스크립트 -->
+    <script>
+      // API 기본 URL
+      const API_BASE_URL = "http://localhost:5000/api";
+      
+      // 전역 변수
+      let selectedSchool = ""; // 기본값 없음
+      let selectedGrade = "";  // 기본값 없음
+      let selectedClass = "";  // 기본값 없음
+      let alerts = [];
+      let editingAlertId = null;
+      let isLoggedIn = false;
+      let currentUser = null;
+      let currentPage = 1;
+      let totalPages = 1;
+      let itemsPerPage = 5; // 페이지당 표시할 알림 수
+
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("알리미 페이지가 로드되었습니다.");
+        
+        // 로그인 상태 확인
+        checkLoginStatus();
+        
+        // URL 파라미터 확인 (수정 모드인지 확인)
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get("edit");
+        if (editId) {
+          editingAlertId = editId;
+          openEditModal(editId);
+        }
+
+        // 모달 관련 요소
+        const createAlertModal = document.getElementById("create-alert-modal");
+        const createAlertBtn = document.getElementById("create-alert-btn");
+        const closeModalBtn = document.getElementById("close-modal");
+        const cancelAlertBtn = document.getElementById("cancel-alert");
+        const createAlertForm = document.getElementById("create-alert-form");
+        
+        // 상세보기 모달 관련 요소
+        const alertDetailModal = document.getElementById("alert-detail-modal");
+        const closeDetailModalBtn = document.getElementById("close-detail-modal");
+        
+        // 상세보기 모달 닫기 버튼 이벤트
+        if (closeDetailModalBtn) {
+          closeDetailModalBtn.addEventListener("click", function() {
+            alertDetailModal.classList.add("hidden");
+          });
+        }
+        
+        // 상세보기 모달 외부 클릭 시 닫기
+        if (alertDetailModal) {
+          alertDetailModal.addEventListener("click", function(e) {
+            if (e.target === alertDetailModal) {
+              alertDetailModal.classList.add("hidden");
+            }
+          });
+        }
+
+        // 모달 열기
+        createAlertBtn.addEventListener("click", function () {
+          // 모달 제목 설정 (h3 요소 직접 선택)
+          const modalTitle = createAlertModal.querySelector(".flex.justify-between.items-center h3");
+          if (modalTitle) {
+            modalTitle.textContent = "새 알림 만들기";
+          }
+          
+          editingAlertId = null;
+          createAlertForm.reset();
+          createAlertModal.classList.remove("hidden");
+        });
+
+        // 모달 닫기
+        function closeModal() {
+          createAlertModal.classList.add("hidden");
+          editingAlertId = null;
+          createAlertForm.reset();
+        }
+
+        // 닫기 버튼 이벤트
+        closeModalBtn.addEventListener("click", closeModal);
+        cancelAlertBtn.addEventListener("click", closeModal);
+
+        // 모달 외부 클릭 시 닫기
+        window.addEventListener("click", function (e) {
+          if (e.target === createAlertModal) {
+            closeModal();
+          }
+        });
+
+        // 폼 제출 처리
+        createAlertForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // 폼 데이터 수집
+          const title = document.getElementById("alert-title").value;
+          const date = document.getElementById("alert-date").value;
+          const description = document.getElementById("alert-description").value;
+          const notify = document.getElementById("alert-notify").checked;
+
+          // 알림 데이터 객체 생성
+          const alertData = {
+            title,
+            date,
+            description,
+            notify,
+            school: selectedSchool,
+            grade: selectedGrade,
+            class: selectedClass
+          };
+
+          try {
+            let response;
+            
+            // 헤더 설정
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            
+            // 로그인한 경우 토큰 추가
+            const token = localStorage.getItem('token');
+            if (token) {
+              headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            if (editingAlertId) {
+              // 기존 알림 수정
+              response = await fetch(`${API_BASE_URL}/alerts/${editingAlertId}`, {
+                method: "PUT",
+                headers,
+                body: JSON.stringify(alertData)
+              });
+            } else {
+              // 새 알림 생성
+              response = await fetch(`${API_BASE_URL}/alerts`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(alertData)
+              });
+            }
+
+            if (!response.ok) {
+              const data = await response.json();
+              throw new Error(data.message || "알림 저장에 실패했습니다.");
+            }
+
+            const result = await response.json();
+            console.log("알림 저장 성공:", result);
+
+            // 모달 닫기
+            closeModal();
+
+            // 폼 초기화
+            createAlertForm.reset();
+
+            // 알림 목록 새로고침
+            fetchAlerts();
+
+            // 성공 메시지 표시
+            alert(editingAlertId ? "알림이 성공적으로 수정되었습니다!" : "새 알림이 성공적으로 생성되었습니다!");
+          } catch (error) {
+            console.error("알림 저장 오류:", error);
+            alert(error.message || "알림 저장 중 오류가 발생했습니다.");
+          }
+        });
+
+        // 필터 및 검색 기능 구현
+        const filterDate = document.getElementById("filter-date");
+        const searchAlert = document.getElementById("search-alert");
+
+        // 필터 변경 시 이벤트 처리
+        filterDate.addEventListener("change", applyFilters);
+
+        // 검색어 입력 시 이벤트 처리
+        searchAlert.addEventListener("input", applyFilters);
+
+        // 초기 알림 목록 로드
+        fetchAlerts();
+      });
+      
+      // 알림 수정 모달 열기
+      async function openEditModal(alertId) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/alerts/${alertId}`);
+          
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || "알림 정보를 가져오는데 실패했습니다.");
+          }
+          
+          const alert = await response.json();
+          
+          // 모달 요소 가져오기
+          const createAlertModal = document.getElementById("create-alert-modal");
+          
+          // 모달 제목 변경
+          const modalTitle = createAlertModal.querySelector(".flex.justify-between.items-center h3");
+          if (modalTitle) {
+            modalTitle.textContent = "알림 수정";
+          }
+          
+          // 폼 필드에 데이터 채우기
+          document.getElementById("alert-title").value = alert.title;
+          document.getElementById("alert-date").value = new Date(alert.date).toISOString().split('T')[0];
+          document.getElementById("alert-description").value = alert.description;
+          document.getElementById("alert-notify").checked = alert.notify;
+          
+          // 모달 열기
+          createAlertModal.classList.remove("hidden");
+        } catch (error) {
+          console.error("알림 정보 가져오기 오류:", error);
+          alert(error.message || "알림 정보를 가져오는 중 오류가 발생했습니다.");
+        }
+      }
+
+      // 로그인 상태 확인 및 UI 업데이트
+      function checkLoginStatus() {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+        
+        if (token && userStr) {
+          try {
+            // 사용자 정보 파싱
+            currentUser = JSON.parse(userStr);
+            isLoggedIn = true;
+            
+            // UI 업데이트
+            updateUIForLoggedInUser();
+            
+            // 로그인된 사용자의 학교/학년/반 정보로 초기화
+            if (currentUser) {
+              selectedSchool = currentUser.school;
+              selectedGrade = currentUser.grade;
+              selectedClass = currentUser.class;
+              
+              // 알림 데이터 로드
+              setTimeout(() => {
+                fetchAlerts();
+              }, 300);
+            }
+          } catch (error) {
+            console.error('사용자 정보 파싱 오류:', error);
+            // 오류 발생 시 로그아웃 처리
+            logout();
+          }
+        } else {
+          isLoggedIn = false;
+          currentUser = null;
+          updateUIForLoggedOutUser();
+          
+          // 비로그인 사용자는 로컬 스토리지에서 학교/학년/반 정보 불러오기
+          loadSchoolSelectionFromLocalStorage();
+        }
+      }
+      
+      // 로컬 스토리지에서 학교/학년/반 선택 불러오기
+      function loadSchoolSelectionFromLocalStorage() {
+        const savedSelection = localStorage.getItem('schoolSelection');
+        
+        if (savedSelection) {
+          try {
+            const selection = JSON.parse(savedSelection);
+            selectedSchool = selection.school || "";
+            selectedGrade = selection.grade || "";
+            selectedClass = selection.class || "";
+            
+            console.log("로컬 스토리지에서 학교 정보 로드:", { selectedSchool, selectedGrade, selectedClass });
+            
+            // 알림 데이터 로드 (학교 정보가 있는 경우에만)
+            if (selectedSchool && selectedGrade && selectedClass) {
+              setTimeout(() => {
+                fetchAlerts();
+              }, 300);
+            } else {
+              console.warn("학교 정보가 불완전합니다. 알림을 로드하지 않습니다.");
+            }
+          } catch (error) {
+            console.error('학교 선택 정보 파싱 오류:', error);
+          }
+        } else {
+          // 저장된 정보가 없으면 홈페이지로 리다이렉트
+          alert('먼저 홈페이지에서 학교와 학년, 반을 선택해주세요.');
+          window.location.href = 'index.html';
+        }
+      }
+      
+      // 로그인 상태 UI 업데이트
+      function updateUIForLoggedInUser() {
+        // 데스크톱 네비게이션 업데이트
+        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        if (desktopNav) {
+          const loginLi = desktopNav.querySelector('li:last-child');
+          if (loginLi) {
+            loginLi.innerHTML = `
+              <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
+            `;
+            
+            // 로그아웃 버튼 이벤트 추가
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+              logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+              });
+            }
+          }
+        }
+        
+        // 모바일 네비게이션 업데이트
+        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        if (mobileNav) {
+          const loginLink = mobileNav.querySelector('a:last-child');
+          if (loginLink) {
+            loginLink.href = '#';
+            loginLink.classList.remove('text-primary');
+            loginLink.classList.add('text-gray-600');
+            
+            const icon = loginLink.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-sign-in-alt');
+              icon.classList.add('fa-sign-out-alt');
+            }
+            
+            const span = loginLink.querySelector('span');
+            if (span) {
+              span.textContent = '로그아웃';
+            }
+            
+            // 로그아웃 이벤트 추가
+            loginLink.addEventListener('click', function(e) {
+              e.preventDefault();
+              logout();
+            });
+          }
+        }
+        
+        // 사용자 정보 표시 (선택적)
+        if (currentUser) {
+          // 사용자 이름 표시 영역 추가 (없는 경우)
+          const headerContainer = document.querySelector('header.hidden.md\\:block .container');
+          if (headerContainer && !document.getElementById('user-info')) {
+            const userInfo = document.createElement('div');
+            userInfo.id = 'user-info';
+            userInfo.className = 'text-sm text-gray-600';
+            userInfo.innerHTML = `<span class="font-medium">${currentUser.name}</span>님 환영합니다`;
+            headerContainer.appendChild(userInfo);
+          }
+        }
+      }
+      
+      // 로그아웃 상태 UI 업데이트
+      function updateUIForLoggedOutUser() {
+        // 데스크톱 네비게이션 업데이트
+        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        if (desktopNav) {
+          const loginLi = desktopNav.querySelector('li:last-child');
+          if (loginLi) {
+            loginLi.innerHTML = `
+              <a href="login.html" class="text-gray-600 hover:text-primary">로그인</a>
+            `;
+          }
+        }
+        
+        // 모바일 네비게이션 업데이트
+        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        if (mobileNav) {
+          const loginLink = mobileNav.querySelector('a:last-child');
+          if (loginLink) {
+            loginLink.href = 'login.html';
+            loginLink.classList.remove('text-primary');
+            loginLink.classList.add('text-gray-600');
+            
+            const icon = loginLink.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-sign-out-alt');
+              icon.classList.add('fa-sign-in-alt');
+            }
+            
+            const span = loginLink.querySelector('span');
+            if (span) {
+              span.textContent = '로그인';
+            }
+            
+            // 이벤트 리스너 제거
+            loginLink.replaceWith(loginLink.cloneNode(true));
+          }
+        }
+        
+        // 사용자 정보 제거
+        const userInfo = document.getElementById('user-info');
+        if (userInfo) {
+          userInfo.remove();
+        }
+      }
+      
+      // 로그아웃 처리
+      function logout() {
+        // 로컬 스토리지에서 토큰 및 사용자 정보 제거
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // 상태 변수 초기화
+        isLoggedIn = false;
+        currentUser = null;
+        
+        // UI 업데이트
+        updateUIForLoggedOutUser();
+        
+        // 로그인 페이지로 리다이렉트
+        window.location.href = 'login.html';
+      }
+
+      // 알림 목록 가져오기
+      async function fetchAlerts() {
+        try {
+          // 로딩 표시 보이기
+          const loadingElement = document.getElementById("alerts-loading");
+          const noAlertsMessage = document.getElementById("no-alerts-message");
+          const alertsContainer = document.getElementById("alerts-container");
+          
+          if (loadingElement) loadingElement.classList.remove("hidden");
+          if (noAlertsMessage) noAlertsMessage.classList.add("hidden");
+          
+          // 기존 알림 카드 제거
+          const existingAlerts = alertsContainer.querySelectorAll(".border.border-gray-200.rounded-md");
+          existingAlerts.forEach(alert => alert.remove());
+          
+          // 필터 값 가져오기
+          const date = document.getElementById("filter-date").value;
+          const searchTerm = document.getElementById("search-alert").value.toLowerCase();
+          
+          // API 요청 URL 구성
+          let url = `${API_BASE_URL}/alerts?school=${selectedSchool}&grade=${selectedGrade}&class=${selectedClass}`;
+          
+          // 인증 토큰 추가
+          const headers = {};
+          const token = localStorage.getItem('token');
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const response = await fetch(url, { headers });
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || "알림을 가져오는데 실패했습니다.");
+          }
+          
+          let fetchedAlerts = await response.json();
+          
+          // 클라이언트 측 필터링 (날짜 및 검색어)
+          if (date && date !== "all") {
+            const today = new Date();
+            const oneDay = 24 * 60 * 60 * 1000; // 하루를 밀리초로 표현
+            
+            if (date === "today") {
+              // 오늘 날짜만 필터링
+              const todayStr = today.toISOString().split('T')[0];
+              fetchedAlerts = fetchedAlerts.filter(alert => {
+                const alertDate = new Date(alert.date).toISOString().split('T')[0];
+                return alertDate === todayStr;
+              });
+            } else if (date === "week") {
+              // 이번 주 필터링 (오늘부터 7일)
+              const weekLater = new Date(today.getTime() + 7 * oneDay);
+              fetchedAlerts = fetchedAlerts.filter(alert => {
+                const alertDate = new Date(alert.date);
+                return alertDate >= today && alertDate <= weekLater;
+              });
+            } else if (date === "month") {
+              // 이번 달 필터링
+              const currentMonth = today.getMonth();
+              const currentYear = today.getFullYear();
+              fetchedAlerts = fetchedAlerts.filter(alert => {
+                const alertDate = new Date(alert.date);
+                return alertDate.getMonth() === currentMonth && alertDate.getFullYear() === currentYear;
+              });
+            }
+          }
+          
+          if (searchTerm) {
+            fetchedAlerts = fetchedAlerts.filter(alert => 
+              alert.title.toLowerCase().includes(searchTerm) || 
+              alert.description.toLowerCase().includes(searchTerm)
+            );
+          }
+          
+          // 로딩 표시 숨기기
+          if (loadingElement) loadingElement.classList.add("hidden");
+          
+          alerts = fetchedAlerts;
+          
+          // 페이지네이션 계산
+          totalPages = Math.ceil(alerts.length / itemsPerPage);
+          if (currentPage > totalPages && totalPages > 0) {
+            currentPage = 1;
+          }
+          
+          // 현재 페이지에 해당하는 알림만 표시
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const endIndex = Math.min(startIndex + itemsPerPage, alerts.length);
+          const currentPageAlerts = alerts.slice(startIndex, endIndex);
+          
+          renderAlerts(currentPageAlerts);
+          renderPagination();
+        } catch (error) {
+          console.error("알림 가져오기 오류:", error);
+          
+          // 로딩 표시 숨기기
+          const loadingElement = document.getElementById("alerts-loading");
+          if (loadingElement) loadingElement.classList.add("hidden");
+          
+          // 오류 메시지 표시
+          const alertsContainer = document.getElementById("alerts-container");
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "text-center py-8 text-red-500";
+          errorMessage.textContent = "알림을 불러오는 중 오류가 발생했습니다.";
+          alertsContainer.appendChild(errorMessage);
+        }
+      }
+      
+      // 필터 적용
+        function applyFilters() {
+        fetchAlerts();
+      }
+      
+      // 알림 목록 렌더링
+      function renderAlerts(alerts) {
+        const alertsContainer = document.getElementById("alerts-container");
+        const loadingElement = document.getElementById("alerts-loading");
+        const noAlertsMessage = document.getElementById("no-alerts-message");
+        
+        // 로딩 표시 숨기기
+        if (loadingElement) loadingElement.classList.add("hidden");
+        
+        // 기존 알림 카드 제거
+        const existingAlerts = alertsContainer.querySelectorAll(".border.border-gray-200.rounded-md");
+        existingAlerts.forEach(alert => alert.remove());
+        
+        // 알림이 없는 경우
+        if (alerts.length === 0) {
+          if (noAlertsMessage) noAlertsMessage.classList.remove("hidden");
+          return;
+        } else {
+          if (noAlertsMessage) noAlertsMessage.classList.add("hidden");
+        }
+        
+        // 알림 카드 추가
+        alerts.forEach(alert => {
+          const alertCard = document.createElement("div");
+          alertCard.className = "border border-gray-200 rounded-md p-4 hover:shadow-md transition cursor-pointer";
+          alertCard.dataset.id = alert._id;
+          
+          // 날짜 포맷팅
+          const date = new Date(alert.date);
+          const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          
+          // 남은 일수 계산
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작 시간으로 설정
+          const alertDate = new Date(alert.date);
+          alertDate.setHours(0, 0, 0, 0); // 알림 날짜의 시작 시간으로 설정
+          
+          const diffTime = alertDate.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          let remainingDaysText = "";
+          let remainingDaysClass = "text-gray-500";
+          
+          if (diffDays < 0) {
+            remainingDaysText = "마감됨";
+            remainingDaysClass = "text-gray-400";
+          } else if (diffDays === 0) {
+            remainingDaysText = "오늘 마감";
+            remainingDaysClass = "text-red-500 font-medium";
+          } else if (diffDays === 1) {
+            remainingDaysText = "내일 마감";
+            remainingDaysClass = "text-red-500 font-medium";
+          } else {
+            remainingDaysText = `${diffDays}일 남음`;
+            if (diffDays <= 3) {
+              remainingDaysClass = "text-orange-500";
+            }
+          }
+          
+          // 작성자 정보 표시
+          const authorText = alert.isAnonymous ? 
+            `<span class="text-gray-500 text-xs ml-2">(${alert.authorName})</span>` : 
+            '';
+          
+          alertCard.innerHTML = `
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+              <div class="flex items-center mb-2 md:mb-0">
+                <h3 class="font-medium">${alert.title}</h3>
+                ${authorText}
+              </div>
+              <div class="flex items-center text-sm text-gray-500">
+                <i class="far fa-calendar-alt mr-1"></i>
+                <span>${formattedDate}</span>
+              </div>
+            </div>
+            <p class="text-gray-600 my-2">${alert.description}</p>
+            <div class="flex flex-wrap justify-between items-center mt-2">
+              <div class="flex items-center text-sm ${remainingDaysClass}">
+                <i class="far fa-clock mr-1"></i>
+                <span>${remainingDaysText}</span>
+              </div>
+              <div class="flex space-x-2 mt-2 md:mt-0">
+                <button class="text-gray-500 text-sm hover:text-primary flex items-center edit-btn" data-id="${alert._id}">
+                  <i class="far fa-edit mr-1"></i> 수정
+                </button>
+                <button class="text-gray-500 text-sm hover:text-danger flex items-center delete-btn" data-id="${alert._id}">
+                  <i class="far fa-trash-alt mr-1"></i> 삭제
+                </button>
+                <button class="text-gray-500 text-sm hover:text-secondary flex items-center share-btn" data-id="${alert._id}">
+                  <i class="far fa-share-square mr-1"></i> 공유
+                </button>
+              </div>
+            </div>
+          `;
+          
+          alertsContainer.appendChild(alertCard);
+          
+          // 알림 카드 클릭 이벤트 (상세 보기 모달 열기)
+          alertCard.addEventListener("click", function(e) {
+            // 버튼 클릭은 무시 (버튼에 자체 이벤트 핸들러가 있음)
+            if (e.target.closest('button')) return;
+            
+            openAlertDetailModal(alert);
+          });
+          
+          // 수정 버튼 이벤트
+          const editBtn = alertCard.querySelector(`.edit-btn[data-id="${alert._id}"]`);
+          editBtn.addEventListener("click", function() {
+            openEditModal(alert._id);
+          });
+          
+          // 삭제 버튼 이벤트
+          const deleteBtn = alertCard.querySelector(`.delete-btn[data-id="${alert._id}"]`);
+          deleteBtn.addEventListener("click", function() {
+            deleteAlert(alert._id);
+          });
+          
+          // 공유 버튼 이벤트
+          const shareBtn = alertCard.querySelector(`.share-btn[data-id="${alert._id}"]`);
+          shareBtn.addEventListener("click", function() {
+            shareAlert(alert);
+          });
+        });
+      }
+      
+      // 알림 상세 보기 모달 열기
+      function openAlertDetailModal(alert) {
+        const modal = document.getElementById('alert-detail-modal');
+        const modalTitle = document.getElementById('modal-alert-title');
+        const modalDate = document.getElementById('modal-alert-date');
+        const modalDescription = document.getElementById('modal-alert-description');
+        const modalAuthor = document.getElementById('modal-alert-author');
+        const modalEditBtn = document.getElementById('modal-edit-btn');
+        const modalDeleteBtn = document.getElementById('modal-delete-btn');
+        const modalShareBtn = document.getElementById('modal-share-btn');
+        
+        // 모달 내용 채우기
+        modalTitle.textContent = alert.title;
+        
+        // 날짜 포맷팅
+        const date = new Date(alert.date);
+        const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+        modalDate.textContent = formattedDate;
+        
+        // 설명
+        modalDescription.textContent = alert.description;
+        
+        // 작성자 정보
+        if (alert.isAnonymous && alert.authorName) {
+          modalAuthor.textContent = `작성자: ${alert.authorName}`;
+        } else {
+          modalAuthor.textContent = '';
+        }
+        
+        // 버튼 이벤트 설정
+        modalEditBtn.onclick = function() {
+          modal.classList.add('hidden');
+          openEditModal(alert._id);
+        };
+        
+        modalDeleteBtn.onclick = function() {
+          modal.classList.add('hidden');
+          deleteAlert(alert._id);
+        };
+        
+        modalShareBtn.onclick = function() {
+          shareAlert(alert);
+        };
+        
+        // 모달 닫기 버튼
+        const closeModalBtn = document.getElementById('close-detail-modal');
+        closeModalBtn.onclick = function() {
+          modal.classList.add('hidden');
+        };
+        
+        // 모달 외부 클릭 시 닫기
+        modal.onclick = function(e) {
+          if (e.target === modal) {
+            modal.classList.add('hidden');
+          }
+        };
+        
+        // 모달 표시
+        modal.classList.remove('hidden');
+      }
+      
+      // 알림 공유 기능
+      function shareAlert(alert) {
+        // 공유할 텍스트 생성
+        const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${new Date(alert.date).toLocaleDateString()}\n내용: ${alert.description}`;
+        
+        // 클립보드에 복사
+        navigator.clipboard.writeText(shareText)
+          .then(() => {
+            alert("알림 정보가 클립보드에 복사되었습니다.");
+          })
+          .catch(err => {
+            console.error('클립보드 복사 실패:', err);
+            alert("클립보드 복사에 실패했습니다.");
+          });
+      }
+
+      // 알림 삭제
+      async function deleteAlert(id) {
+        if (!confirm("정말로 이 알림을 삭제하시겠습니까?")) return;
+        
+        try {
+          // 헤더 설정
+          const headers = {};
+          
+          // 로그인한 경우 토큰 추가
+          const token = localStorage.getItem('token');
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const response = await fetch(`${API_BASE_URL}/alerts/${id}`, {
+            method: "DELETE",
+            headers
+          });
+          
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || "알림 삭제에 실패했습니다.");
+          }
+          
+          // 성공 시 목록 새로고침
+          fetchAlerts();
+          alert("알림이 성공적으로 삭제되었습니다.");
+        } catch (error) {
+          console.error("알림 삭제 오류:", error);
+          alert(error.message || "알림 삭제 중 오류가 발생했습니다.");
+        }
+      }
+
+      // 페이지네이션 렌더링
+      function renderPagination() {
+        const paginationContainer = document.getElementById("pagination-container");
+        paginationContainer.innerHTML = "";
+        
+        if (totalPages <= 1) {
+          return; // 페이지가 1개 이하면 페이지네이션 표시 안 함
+        }
+        
+        // 이전 버튼
+        const prevButton = document.createElement("a");
+        prevButton.href = "#";
+        prevButton.className = "px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+        prevButton.textContent = "이전";
+        prevButton.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            fetchAlerts();
+          }
+        });
+        paginationContainer.appendChild(prevButton);
+        
+        // 페이지 버튼 생성
+        const maxVisiblePages = 5; // 한 번에 표시할 최대 페이지 버튼 수
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        // 시작 페이지 조정
+        if (endPage - startPage + 1 < maxVisiblePages) {
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        // 첫 페이지로 이동 버튼 (필요한 경우)
+        if (startPage > 1) {
+          const firstPageButton = document.createElement("a");
+          firstPageButton.href = "#";
+          firstPageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+          firstPageButton.textContent = "1";
+          firstPageButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage = 1;
+            fetchAlerts();
+          });
+          paginationContainer.appendChild(firstPageButton);
+          
+          // 생략 표시 (필요한 경우)
+          if (startPage > 2) {
+            const ellipsis = document.createElement("span");
+            ellipsis.className = "px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500";
+            ellipsis.textContent = "...";
+            paginationContainer.appendChild(ellipsis);
+          }
+        }
+        
+        // 페이지 버튼
+        for (let i = startPage; i <= endPage; i++) {
+          const pageButton = document.createElement("a");
+          pageButton.href = "#";
+          pageButton.textContent = i;
+          
+          if (i === currentPage) {
+            pageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-primary text-white";
+          } else {
+            pageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+          }
+          
+          pageButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage = i;
+            fetchAlerts();
+          });
+          
+          paginationContainer.appendChild(pageButton);
+        }
+        
+        // 마지막 페이지로 이동 버튼 (필요한 경우)
+        if (endPage < totalPages) {
+          // 생략 표시 (필요한 경우)
+          if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement("span");
+            ellipsis.className = "px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500";
+            ellipsis.textContent = "...";
+            paginationContainer.appendChild(ellipsis);
+          }
+          
+          const lastPageButton = document.createElement("a");
+          lastPageButton.href = "#";
+          lastPageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+          lastPageButton.textContent = totalPages;
+          lastPageButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            currentPage = totalPages;
+            fetchAlerts();
+          });
+          paginationContainer.appendChild(lastPageButton);
+        }
+        
+        // 다음 버튼
+        const nextButton = document.createElement("a");
+        nextButton.href = "#";
+        nextButton.className = "px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+        nextButton.textContent = "다음";
+        nextButton.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            fetchAlerts();
+          }
+        });
+        paginationContainer.appendChild(nextButton);
+      }
+      
+      // 페이지 변경 함수
+      function changePage(page) {
+        if (page >= 1 && page <= totalPages) {
+          currentPage = page;
+          fetchAlerts();
+        }
+      }
+    </script>
+  </body>
+</html>

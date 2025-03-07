@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>수행평가 알리미</title>
+    <!-- PWA 관련 메타 태그 -->
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="description" content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/android-chrome-192x192" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pretendard 폰트 -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css"
+    />
+    <!-- Font Awesome 아이콘 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+          "Noto Sans KR", "Malgun Gothic", sans-serif;
+      }
+      /* 모바일 하단 네비게이션 바를 위한 여백 */
+      .mobile-nav-padding {
+        padding-bottom: 4rem;
+      }
+      /* 캘린더 날짜 스타일 */
+      .calendar-day {
+        height: 2.5rem;
+        width: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin: 0 auto;
+        border-radius: 50%;
+      }
+      .calendar-day:hover {
+        background-color: #f3f4f6;
+        cursor: pointer;
+      }
+      .calendar-day.has-event {
+        font-weight: 600;
+      }
+      .calendar-day.active {
+        background-color: #4f46e5;
+        color: white;
+      }
+      /* 탭 스타일 */
+      .tab-active {
+        color: #4f46e5;
+        border-bottom: 2px solid #4f46e5;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              secondary: "#10B981",
+              accent: "#F59E0B",
+              danger: "#EF4444",
+            },
+          },
+        },
+      };
+    </script>
+    <!-- PWA 스크립트 -->
+    <script src="pwa.js" defer></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen mobile-nav-padding">
+    <!-- 헤더 - 데스크톱에서만 표시 -->
+    <header class="bg-white shadow-sm hidden md:block">
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a href="index.html" class="text-primary font-medium">홈</a>
+            </li>
+            <li>
+              <a href="alerts.html" class="text-gray-600 hover:text-primary"
+                >알리미</a
+              >
+            </li>
+            <li>
+              <a href="profile.html" class="text-gray-600 hover:text-primary"
+                >내 정보</a
+              >
+            </li>
+            <li>
+              <a href="login.html" class="text-gray-600 hover:text-primary"
+                >로그인</a
+              >
+            </li>
+            <li>
+              <button 
+                id="install-button" 
+                class="text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-md hidden"
+              >
+                앱 설치하기
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- 모바일 헤더 - 모바일에서만 표시 -->
+    <header class="bg-white shadow-sm md:hidden">
+      <div class="container mx-auto px-4 py-4 flex justify-center items-center">
+        <h1 class="text-xl font-bold text-primary">수행평가 알리미</h1>
+      </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- 학교/반 선택 섹션 - 비로그인 사용자에게만 표시 -->
+      <section id="school-selection" class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">학교/학년/반 선택</h2>
+          <button id="toggle-school-section" class="text-gray-500 hover:text-primary">
+            <i class="fas fa-chevron-up"></i>
+          </button>
+        </div>
+        <div id="school-section-content">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label
+              for="school"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >학교</label
+            >
+            <select
+              id="school"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            >
+              <option value="">학교를 선택하세요</option>
+              </select>
+            </div>
+            <div>
+              <label
+                for="grade"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >학년</label
+              >
+              <select
+                id="grade"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              >
+                <option value="">학년을 선택하세요</option>
+            </select>
+          </div>
+          <div>
+            <label
+              for="class"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >반</label
+            >
+            <select
+              id="class"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+            >
+              <option value="">반을 선택하세요</option>
+            </select>
+          </div>
+        </div>
+        <button
+            id="save-school-selection"
+          class="mt-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
+        >
+          선택 완료
+        </button>
+        </div>
+      </section>
+
+      <!-- 통합 알리미 & 캘린더 섹션 -->
+      <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <!-- 탭 메뉴 -->
+        <div class="flex border-b border-gray-200 mb-6">
+          <button id="tab-list" class="px-4 py-2 tab-active">알림</button>
+          <button id="tab-calendar" class="px-4 py-2">캘린더</button>
+          <button id="tab-todo" class="px-4 py-2">할 것</button>
+          <button id="tab-tips" class="px-4 py-2">팁</button>
+        </div>
+
+        <!-- 알림 목록 탭 -->
+        <div id="content-list" class="space-y-4">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">최근 알림</h2>
+            <div class="flex space-x-2">
+              <a
+                href="alerts.html"
+                class="bg-primary text-white text-sm px-3 py-1 rounded-md"
+              >
+                <i class="fas fa-plus mr-1"></i> 새 알림
+              </a>
+            </div>
+          </div>
+
+          <!-- 알림 카드들이 동적으로 추가될 영역 -->
+          <div id="alerts-list" class="space-y-4">
+            <!-- 알림이 없을 경우 표시될 메시지 -->
+            <div id="no-alerts-message" class="text-center py-4 text-gray-500 hidden">
+              등록된 알림이 없습니다.
+          </div>
+
+            <!-- 로딩 표시 -->
+            <div id="alerts-loading" class="text-center py-4">
+              <i class="fas fa-spinner fa-spin text-primary mr-2"></i> 알림을 불러오는 중...
+            </div>
+          </div>
+
+          <div class="flex justify-center mt-6">
+            <a href="alerts.html" class="text-primary hover:underline"
+              >더 보기</a
+            >
+          </div>
+        </div>
+
+        <!-- 캘린더 탭 -->
+        <div id="content-calendar" class="hidden">
+          <!-- 캘린더 헤더 -->
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">2025년 3월</h2>
+            <div class="flex space-x-2">
+              <button class="text-gray-600 hover:text-primary">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="text-gray-600 hover:text-primary" id="reset-calendar">
+                <i class="fas fa-calendar-day"></i>
+              </button>
+              <button class="text-gray-600 hover:text-primary">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 캘린더 그리드 -->
+          <div class="grid grid-cols-7 gap-2 text-center mb-4">
+            <div class="text-red-500 font-medium">일</div>
+            <div class="font-medium">월</div>
+            <div class="font-medium">화</div>
+            <div class="font-medium">수</div>
+            <div class="font-medium">목</div>
+            <div class="font-medium">금</div>
+            <div class="text-blue-500 font-medium">토</div>
+
+            <!-- 날짜 -->
+            <div class="py-1">
+              <div class="calendar-day text-gray-400">26</div>
+            </div>
+            <div class="py-1">
+              <div class="calendar-day text-gray-400">27</div>
+            </div>
+            <div class="py-1">
+              <div class="calendar-day text-gray-400">28</div>
+            </div>
+            <div class="py-1"><div class="calendar-day">1</div></div>
+            <div class="py-1"><div class="calendar-day">2</div></div>
+            <div class="py-1">
+              <div class="calendar-day has-event">
+                3
+                <span
+                  class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full"
+                ></span>
+              </div>
+            </div>
+            <div class="py-1"><div class="calendar-day">4</div></div>
+
+            <div class="py-1"><div class="calendar-day">5</div></div>
+            <div class="py-1">
+              <div class="calendar-day has-event active">
+                6
+                <span
+                  class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+                ></span>
+              </div>
+            </div>
+            <div class="py-1"><div class="calendar-day">7</div></div>
+            <div class="py-1"><div class="calendar-day">8</div></div>
+            <div class="py-1">
+              <div class="calendar-day has-event">
+                9
+                <span
+                  class="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"
+                ></span>
+              </div>
+            </div>
+            <div class="py-1"><div class="calendar-day">10</div></div>
+            <div class="py-1"><div class="calendar-day">11</div></div>
+
+            <div class="py-1"><div class="calendar-day">12</div></div>
+            <div class="py-1">
+              <div class="calendar-day has-event">
+                13
+                <span
+                  class="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"
+                ></span>
+              </div>
+            </div>
+            <div class="py-1"><div class="calendar-day">14</div></div>
+            <div class="py-1"><div class="calendar-day">15</div></div>
+            <div class="py-1"><div class="calendar-day">16</div></div>
+            <div class="py-1">
+              <div class="calendar-day has-event">
+                17
+                <span
+                  class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+                ></span>
+              </div>
+            </div>
+            <div class="py-1"><div class="calendar-day">18</div></div>
+
+            <div class="py-1"><div class="calendar-day">19</div></div>
+            <div class="py-1"><div class="calendar-day">20</div></div>
+            <div class="py-1"><div class="calendar-day">21</div></div>
+            <div class="py-1"><div class="calendar-day">22</div></div>
+            <div class="py-1"><div class="calendar-day">23</div></div>
+            <div class="py-1"><div class="calendar-day">24</div></div>
+            <div class="py-1"><div class="calendar-day">25</div></div>
+
+            <div class="py-1"><div class="calendar-day">26</div></div>
+            <div class="py-1"><div class="calendar-day">27</div></div>
+            <div class="py-1"><div class="calendar-day">28</div></div>
+            <div class="py-1"><div class="calendar-day">29</div></div>
+            <div class="py-1"><div class="calendar-day">30</div></div>
+            <div class="py-1"><div class="calendar-day">31</div></div>
+            <div class="py-1">
+              <div class="calendar-day text-gray-400">1</div>
+            </div>
+          </div>
+
+          <!-- 선택된 날짜의 일정 -->
+          <div class="border-t border-gray-200 pt-4 mt-2">
+            <h3 class="font-medium text-lg mb-3">3월 6일 일정</h3>
+            <div class="space-y-3" id="day-events">
+              <!-- 일정이 동적으로 추가될 영역 -->
+              <div class="text-center py-4 text-gray-500" id="no-day-events">
+                등록된 일정이 없습니다.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 투두리스트 탭 -->
+        <div id="content-todo" class="hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">To do list</h2>
+            <div class="flex space-x-2">
+              <button id="save-memo-btn" class="bg-primary text-white text-sm px-3 py-1 rounded-md">
+                <i class="fas fa-save mr-1"></i> 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- 메모 에디터 -->
+          <div id="memo-editor" class="bg-white rounded-md shadow-sm border border-gray-200 p-4 min-h-[400px]">
+            <div>
+              <textarea id="memo-content" class="w-full p-2 border-0 focus:ring-0 focus:outline-none resize-none" rows="15" placeholder="내용을 입력하세요..."></textarea>
+            </div>
+            <div class="text-right text-xs text-gray-400 mt-2" id="memo-last-saved">
+              마지막 저장: 없음
+            </div>
+          </div>
+        </div>
+
+        <!-- 팁 게시판 탭 -->
+        <div id="content-tips" class="hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">학습 팁 게시판</h2>
+            <div class="flex space-x-2">
+              <button id="add-tip-btn" class="bg-primary text-white text-sm px-3 py-1 rounded-md">
+                <i class="fas fa-plus mr-1"></i> 새 팁 작성
+              </button>
+            </div>
+          </div>
+
+          <!-- 팁 작성 폼 -->
+          <div id="tip-form" class="mb-4 p-4 bg-gray-50 rounded-md hidden">
+            <div class="mb-3">
+              <label for="tip-content" class="block text-sm font-medium text-gray-700 mb-1">내용</label>
+              <textarea id="tip-content" class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" rows="3" placeholder="학습 팁을 공유해주세요"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="tip-author" class="block text-sm font-medium text-gray-700 mb-1">닉네임 (선택)</label>
+              <input type="text" id="tip-author" class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" placeholder="익명으로 남기려면 비워두세요">
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button id="cancel-tip-btn" class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm">취소</button>
+              <button id="save-tip-btn" class="px-3 py-1 bg-primary text-white rounded-md hover:bg-indigo-600 text-sm">저장</button>
+            </div>
+          </div>
+
+          <!-- 팁 목록 -->
+          <div id="tips-list" class="space-y-4">
+            <!-- 팁이 동적으로 추가될 영역 -->
+            <div id="no-tips-message" class="text-center py-4 text-gray-500">
+              등록된 팁이 없습니다.
+            </div>
+            <div id="tips-loading" class="text-center py-4">
+              <i class="fas fa-spinner fa-spin text-primary mr-2"></i> 팁을 불러오는 중...
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 알림 상세 보기 모달 -->
+    <div
+      id="alert-detail-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="modal-alert-title" class="text-lg font-semibold">알림 제목</h3>
+          <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center">
+              <i class="far fa-calendar-alt text-gray-500 mr-2"></i>
+              <span id="modal-alert-date" class="text-sm text-gray-600">날짜</span>
+            </div>
+            <div id="modal-alert-author" class="text-sm text-gray-500"></div>
+          </div>
+          <div class="border-t border-gray-200 pt-3 mt-2">
+            <p id="modal-alert-description" class="text-gray-700">알림 내용</p>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button
+            id="modal-edit-btn"
+            class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+          >
+            <i class="far fa-edit mr-1"></i> 수정
+          </button>
+          <button
+            id="modal-delete-btn"
+            class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+          >
+            <i class="far fa-trash-alt mr-1"></i> 삭제
+          </button>
+          <button
+            id="modal-share-btn"
+            class="px-3 py-1 bg-primary text-white rounded-md hover:bg-indigo-600 text-sm"
+          >
+            <i class="far fa-share-square mr-1"></i> 공유
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 팁 상세 보기 모달 -->
+    <div
+      id="tip-detail-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">학습 팁</h3>
+          <button id="close-tip-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <div id="tip-modal-author" class="text-sm text-gray-500"></div>
+            <div id="tip-modal-date" class="text-sm text-gray-600"></div>
+          </div>
+          <div class="border-t border-gray-200 pt-3 mt-2">
+            <p id="tip-modal-content" class="text-gray-700"></p>
+          </div>
+          <div class="flex items-center mt-3">
+            <button id="tip-like-btn" class="flex items-center text-gray-500 hover:text-primary">
+              <i class="far fa-thumbs-up mr-1"></i>
+              <span id="tip-like-count">0</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 댓글 섹션 -->
+        <div class="border-t border-gray-200 pt-3 mt-2">
+          <h4 class="font-medium mb-2">댓글</h4>
+          
+          <!-- 댓글 작성 폼 -->
+          <div class="mb-3">
+            <textarea id="comment-content" class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" rows="2" placeholder="댓글을 작성해주세요"></textarea>
+            <div class="flex justify-between items-center mt-2">
+              <input type="text" id="comment-author" class="p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" placeholder="닉네임 (선택)">
+              <button id="save-comment-btn" class="px-3 py-1 bg-primary text-white rounded-md hover:bg-indigo-600 text-sm ml-2">댓글 작성</button>
+            </div>
+          </div>
+          
+          <!-- 댓글 목록 -->
+          <div id="comments-list" class="space-y-3 max-h-60 overflow-y-auto">
+            <!-- 댓글이 동적으로 추가될 영역 -->
+            <div id="no-comments-message" class="text-center py-2 text-gray-500">
+              댓글이 없습니다.
+            </div>
+            <div id="comments-loading" class="text-center py-2">
+              <i class="fas fa-spinner fa-spin text-primary mr-2"></i> 댓글을 불러오는 중...
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-2 mt-4">
+          <button
+            id="tip-delete-btn"
+            class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
+          >
+            <i class="far fa-trash-alt mr-1"></i> 삭제
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class=" text-white hidden md:block">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+          </div>
+          <div>
+            <p class="text-sm text-black">
+              &copy; 2025 수행평가 알리미. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 모바일 하단 네비게이션 바 -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200"
+    >
+      <div class="flex justify-around">
+        <a
+          href="index.html"
+          class="flex flex-col items-center py-2 px-3 text-primary"
+        >
+          <i class="fas fa-home text-xl mb-1"></i>
+          <span class="text-xs">홈</span>
+        </a>
+        <a
+          href="alerts.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-clipboard-list text-xl mb-1"></i>
+          <span class="text-xs">알리미</span>
+        </a>
+        <a
+          href="profile.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-user text-xl mb-1"></i>
+          <span class="text-xs">내 정보</span>
+        </a>
+        <a
+          href="login.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-sign-in-alt text-xl mb-1"></i>
+          <span class="text-xs">로그인</span>
+        </a>
+        <button
+          id="mobile-install-button"
+          class="flex flex-col items-center py-2 px-3 text-gray-600 hidden"
+        >
+          <i class="fas fa-download text-xl mb-1"></i>
+          <span class="text-xs">앱 설치</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 자바스크립트 -->
+    <script>
+      // API 기본 URL
+      const API_BASE_URL = "http://localhost:5000/api";
+      
+      // 전역 변수
+      let selectedSchool = "";
+      let selectedGrade = "";
+      let selectedClass = "";
+      let alerts = [];
+      let isLoggedIn = false;
+      let currentUser = null;
+      let isSchoolSectionCollapsed = false;
+      let currentCalendarDate = new Date(); // 현재 캘린더 날짜 추가
+
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("수행평가 알리미가 로드되었습니다.");
+        
+        // 로그인 상태 확인
+        checkLoginStatus();
+        
+        // 로컬 스토리지에서 학교/학년/반 정보 불러오기
+        loadSchoolSelectionFromLocalStorage();
+        
+        // 학교/반 선택 섹션 토글 버튼 이벤트
+        const toggleSchoolSectionBtn = document.getElementById("toggle-school-section");
+        const schoolSectionContent = document.getElementById("school-section-content");
+        
+        toggleSchoolSectionBtn.addEventListener("click", function() {
+          isSchoolSectionCollapsed = !isSchoolSectionCollapsed;
+          
+          if (isSchoolSectionCollapsed) {
+            schoolSectionContent.classList.add("hidden");
+            toggleSchoolSectionBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+          } else {
+            schoolSectionContent.classList.remove("hidden");
+            toggleSchoolSectionBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+          }
+          
+          // 상태 저장
+          localStorage.setItem('schoolSectionCollapsed', isSchoolSectionCollapsed);
+        });
+        
+        // 저장된 토글 상태 불러오기
+        const savedToggleState = localStorage.getItem('schoolSectionCollapsed');
+        
+        // 캘린더 이전/다음 달 버튼 이벤트
+        const prevMonthBtn = document.querySelector("#content-calendar .flex.space-x-2 button:first-child");
+        const nextMonthBtn = document.querySelector("#content-calendar .flex.space-x-2 button:last-child");
+        const resetCalendarBtn = document.getElementById("reset-calendar");
+        
+        if (prevMonthBtn) {
+          prevMonthBtn.classList.add("hover:bg-gray-100", "p-2", "rounded-full", "transition");
+          prevMonthBtn.addEventListener("click", function() {
+            // 이전 달로 이동
+            const newDate = new Date(currentCalendarDate);
+            newDate.setMonth(newDate.getMonth() - 1);
+            currentCalendarDate = newDate;
+            generateCalendar(currentCalendarDate);
+          });
+        }
+        
+        if (nextMonthBtn) {
+          nextMonthBtn.classList.add("hover:bg-gray-100", "p-2", "rounded-full", "transition");
+          nextMonthBtn.addEventListener("click", function() {
+            // 다음 달로 이동
+            const newDate = new Date(currentCalendarDate);
+            newDate.setMonth(newDate.getMonth() + 1);
+            currentCalendarDate = newDate;
+            generateCalendar(currentCalendarDate);
+          });
+        }
+        
+        if (resetCalendarBtn) {
+          resetCalendarBtn.classList.add("hover:bg-gray-100", "p-2", "rounded-full", "transition");
+          resetCalendarBtn.addEventListener("click", function() {
+            // 오늘 날짜로 리셋
+            currentCalendarDate = new Date();
+            generateCalendar(currentCalendarDate);
+          });
+        }
+        
+        if (savedToggleState === 'true') {
+          isSchoolSectionCollapsed = true;
+          schoolSectionContent.classList.add("hidden");
+          toggleSchoolSectionBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+        }
+        
+        // 학교/반 선택 버튼 이벤트
+        const schoolSelect = document.getElementById("school");
+        const gradeSelect = document.getElementById("grade");
+        const classSelect = document.getElementById("class");
+        const saveSchoolSelectionBtn = document.getElementById("save-school-selection");
+        
+        saveSchoolSelectionBtn.addEventListener("click", function() {
+          selectedSchool = schoolSelect.value;
+          selectedGrade = gradeSelect.value;
+          selectedClass = classSelect.value;
+          
+          if (selectedSchool && selectedGrade && selectedClass) {
+            // 로컬 스토리지에 저장
+            saveSchoolSelectionToLocalStorage();
+            
+            // 알림 데이터 가져오기
+            fetchAlerts();
+            
+            // 성공 메시지
+            alert("학교/학년/반 선택이 저장되었습니다.");
+          } else {
+            alert("학교와 학년, 반을 모두 선택해주세요.");
+          }
+        });
+
+        // 탭 전환 기능
+        const tabList = document.getElementById("tab-list");
+        const tabCalendar = document.getElementById("tab-calendar");
+        const contentList = document.getElementById("content-list");
+        const contentCalendar = document.getElementById("content-calendar");
+        const tabTodo = document.getElementById("tab-todo");
+        const contentTodo = document.getElementById("content-todo");
+        const tabTips = document.getElementById("tab-tips");
+        const contentTips = document.getElementById("content-tips");
+
+        tabList.addEventListener("click", function () {
+          tabList.classList.add("tab-active");
+          tabCalendar.classList.remove("tab-active");
+          tabTodo.classList.remove("tab-active");
+          tabTips.classList.remove("tab-active");
+          contentList.classList.remove("hidden");
+          contentCalendar.classList.add("hidden");
+          contentTodo.classList.add("hidden");
+          contentTips.classList.add("hidden");
+        });
+
+        tabCalendar.addEventListener("click", function () {
+          tabCalendar.classList.add("tab-active");
+          tabList.classList.remove("tab-active");
+          tabTodo.classList.remove("tab-active");
+          tabTips.classList.remove("tab-active");
+          contentCalendar.classList.remove("hidden");
+          contentList.classList.add("hidden");
+          contentTodo.classList.add("hidden");
+          contentTips.classList.add("hidden");
+          
+          // 캘린더 뷰로 전환할 때 캘린더 생성 및 이벤트 업데이트
+          generateCalendar(currentCalendarDate);
+        });
+        
+        // Todo 탭 클릭 이벤트
+        tabTodo.addEventListener("click", function () {
+          tabTodo.classList.add("tab-active");
+          tabList.classList.remove("tab-active");
+          tabCalendar.classList.remove("tab-active");
+          tabTips.classList.remove("tab-active");
+          contentTodo.classList.remove("hidden");
+          contentList.classList.add("hidden");
+          contentCalendar.classList.add("hidden");
+          contentTips.classList.add("hidden");
+                  });
+        
+        // 팁 탭 클릭 이벤트
+        tabTips.addEventListener("click", function () {
+          tabTips.classList.add("tab-active");
+          tabList.classList.remove("tab-active");
+          tabCalendar.classList.remove("tab-active");
+          tabTodo.classList.remove("tab-active");
+          contentTips.classList.remove("hidden");
+          contentList.classList.add("hidden");
+          contentCalendar.classList.add("hidden");
+          contentTodo.classList.add("hidden");
+          
+          // 팁 목록 로드
+          loadTips();
+        });
+
+        // 초기 데이터 로드 (학교/반 목록)
+        loadSchoolsAndClasses();
+        
+        // Todo 관련 이벤트 리스너 설정
+        setupTodoListeners();
+        
+        // 팁 게시판 관련 이벤트 리스너 설정
+        setupTipsListeners();
+        
+        // 페이지 로드 시 캘린더 초기화
+        generateCalendar(currentCalendarDate);
+      });
+      
+      // 로컬 스토리지에 학교/학년/반 선택 저장
+      function saveSchoolSelectionToLocalStorage() {
+        const schoolSelection = {
+          school: selectedSchool,
+          grade: selectedGrade,
+          class: selectedClass
+        };
+        
+        localStorage.setItem('schoolSelection', JSON.stringify(schoolSelection));
+      }
+      
+      // 로컬 스토리지에서 학교/학년/반 선택 불러오기
+      function loadSchoolSelectionFromLocalStorage() {
+        const savedSelection = localStorage.getItem('schoolSelection');
+        
+        if (savedSelection) {
+          try {
+            const selection = JSON.parse(savedSelection);
+            selectedSchool = selection.school;
+            selectedGrade = selection.grade;
+            selectedClass = selection.class;
+            
+            // 선택 상자 업데이트 (학교 목록이 로드된 후에 실행되어야 함)
+            setTimeout(() => {
+              const schoolSelect = document.getElementById("school");
+              const gradeSelect = document.getElementById("grade");
+              const classSelect = document.getElementById("class");
+              
+              if (schoolSelect) schoolSelect.value = selectedSchool;
+              
+              // 학년 옵션 로드 후 선택
+              if (schoolSelect && schoolSelect.value) {
+                const event = new Event('change');
+                schoolSelect.dispatchEvent(event);
+                
+                setTimeout(() => {
+                  if (gradeSelect) gradeSelect.value = selectedGrade;
+                  
+                  // 반 옵션 로드 후 선택
+                  if (gradeSelect && gradeSelect.value) {
+                    const event = new Event('change');
+                    gradeSelect.dispatchEvent(event);
+                    
+                    setTimeout(() => {
+                      if (classSelect) classSelect.value = selectedClass;
+                    }, 100);
+                  }
+                }, 100);
+              }
+            }, 300);
+            
+            // 알림 데이터 로드
+            setTimeout(() => {
+              fetchAlerts();
+            }, 500);
+          } catch (error) {
+            console.error('학교 선택 정보 파싱 오류:', error);
+          }
+        }
+      }
+      
+      // 로그인 상태 확인 및 UI 업데이트
+      function checkLoginStatus() {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+        const schoolSelectionSection = document.getElementById("school-selection");
+        
+        if (token && userStr) {
+          try {
+            // 사용자 정보 파싱
+            currentUser = JSON.parse(userStr);
+            isLoggedIn = true;
+            
+            // UI 업데이트
+            updateUIForLoggedInUser();
+            
+            // 로그인된 사용자도 학교/학년/반 선택 섹션 표시 (주석 처리)
+            // if (schoolSelectionSection) {
+            //   schoolSelectionSection.classList.add("hidden");
+            // }
+            
+            // 로그인된 사용자의 학교/학년/반 정보로 초기화
+            if (currentUser) {
+              selectedSchool = currentUser.school;
+              selectedGrade = currentUser.grade;
+              selectedClass = currentUser.class;
+              
+              // 알림 데이터 로드
+              setTimeout(() => {
+                fetchAlerts();
+              }, 500);
+            }
+          } catch (error) {
+            console.error('사용자 정보 파싱 오류:', error);
+            // 오류 발생 시 로그아웃 처리
+            logout();
+          }
+        } else {
+          isLoggedIn = false;
+          currentUser = null;
+          updateUIForLoggedOutUser();
+          
+          // 비로그인 사용자는 학교/학년/반 선택 섹션 표시 (이미 표시되어 있으므로 주석 처리)
+          // if (schoolSelectionSection) {
+          //   schoolSelectionSection.classList.remove("hidden");
+          // }
+        }
+      }
+      
+      // 로그인 상태 UI 업데이트
+      function updateUIForLoggedInUser() {
+        // 데스크톱 네비게이션 업데이트
+        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        if (desktopNav) {
+          const loginLi = desktopNav.querySelector('li:last-child');
+          if (loginLi) {
+            loginLi.innerHTML = `
+              <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
+            `;
+            
+            // 로그아웃 버튼 이벤트 추가
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+              logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+              });
+            }
+          }
+        }
+        
+        // 모바일 네비게이션 업데이트
+        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        if (mobileNav) {
+          const loginLink = mobileNav.querySelector('a:last-child');
+          if (loginLink) {
+            loginLink.href = '#';
+            loginLink.classList.remove('text-primary');
+            loginLink.classList.add('text-gray-600');
+            
+            const icon = loginLink.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-sign-in-alt');
+              icon.classList.add('fa-sign-out-alt');
+            }
+            
+            const span = loginLink.querySelector('span');
+            if (span) {
+              span.textContent = '로그아웃';
+            }
+            
+            // 로그아웃 이벤트 추가
+            loginLink.addEventListener('click', function(e) {
+              e.preventDefault();
+              logout();
+            });
+          }
+        }
+        
+        // 사용자 정보 표시 (선택적)
+        if (currentUser) {
+          // 사용자 이름 표시 영역 추가 (없는 경우)
+          const headerContainer = document.querySelector('header.hidden.md\\:block .container');
+          if (headerContainer && !document.getElementById('user-info')) {
+            const userInfo = document.createElement('div');
+            userInfo.id = 'user-info';
+            userInfo.className = 'text-sm text-gray-600';
+            userInfo.innerHTML = `<span class="font-medium">${currentUser.name}</span>님 환영합니다`;
+            headerContainer.appendChild(userInfo);
+          }
+        }
+      }
+      
+      // 로그아웃 상태 UI 업데이트
+      function updateUIForLoggedOutUser() {
+        // 데스크톱 네비게이션 업데이트
+        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        if (desktopNav) {
+          const loginLi = desktopNav.querySelector('li:last-child');
+          if (loginLi) {
+            loginLi.innerHTML = `
+              <a href="login.html" class="text-gray-600 hover:text-primary">로그인</a>
+            `;
+          }
+        }
+        
+        // 모바일 네비게이션 업데이트
+        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        if (mobileNav) {
+          const loginLink = mobileNav.querySelector('a:last-child');
+          if (loginLink) {
+            loginLink.href = 'login.html';
+            loginLink.classList.remove('text-primary');
+            loginLink.classList.add('text-gray-600');
+            
+            const icon = loginLink.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-sign-out-alt');
+              icon.classList.add('fa-sign-in-alt');
+            }
+            
+            const span = loginLink.querySelector('span');
+            if (span) {
+              span.textContent = '로그인';
+            }
+            
+            // 이벤트 리스너 제거
+            loginLink.replaceWith(loginLink.cloneNode(true));
+          }
+        }
+        
+        // 사용자 정보 제거
+        const userInfo = document.getElementById('user-info');
+        if (userInfo) {
+          userInfo.remove();
+        }
+      }
+      
+      // 로그아웃 처리
+      function logout() {
+        // 로컬 스토리지에서 토큰 및 사용자 정보 제거
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rememberMe');
+        
+        // 상태 변수 초기화
+        isLoggedIn = false;
+        currentUser = null;
+        
+        // UI 업데이트
+        updateUIForLoggedOutUser();
+        
+        // 학교/학년/반 선택 섹션 표시 (이미 표시되어 있으므로 주석 처리)
+        // const schoolSelectionSection = document.getElementById("school-selection");
+        // if (schoolSelectionSection) {
+        //   schoolSelectionSection.classList.remove("hidden");
+        // }
+        
+        // 로그인 페이지로 리다이렉트
+        window.location.href = 'login.html';
+      }
+      
+      // 학교와 반 목록 로드 (예시 데이터)
+      function loadSchoolsAndClasses() {
+        // 실제 API에서 학교 목록 가져오기
+        fetch(`${API_BASE_URL}/schools`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('학교 목록을 불러오는데 실패했습니다.');
+            }
+            return response.json();
+          })
+          .then(schools => {
+            const schoolSelect = document.getElementById("school");
+            
+            // 기존 옵션 제거 (첫 번째 옵션 제외)
+            while (schoolSelect.options.length > 1) {
+              schoolSelect.remove(1);
+            }
+            
+            // 학교 옵션 추가
+            schools.forEach(school => {
+              const option = document.createElement("option");
+              option.value = school.name;
+              option.textContent = school.name;
+              schoolSelect.appendChild(option);
+            });
+            
+            // 학년 목록 (고정)
+            const grades = [
+              { id: "grade1", name: "1학년" },
+              { id: "grade2", name: "2학년" },
+              { id: "grade3", name: "3학년" }
+            ];
+            
+            // 학교 선택 시 해당 학교의 학년만 표시
+            schoolSelect.addEventListener("change", function() {
+              const gradeSelect = document.getElementById("grade");
+              const classSelect = document.getElementById("class");
+              
+              // 기존 학년 옵션 제거 (첫 번째 옵션 제외)
+              while (gradeSelect.options.length > 1) {
+                gradeSelect.remove(1);
+              }
+              
+              // 기존 반 옵션 제거 (첫 번째 옵션 제외)
+              while (classSelect.options.length > 1) {
+                classSelect.remove(1);
+              }
+              
+              // 선택된 학교의 학년 추가 (모든 학년 표시)
+              const selectedSchool = this.value;
+              if (selectedSchool) {
+                grades.forEach(grade => {
+                  const option = document.createElement("option");
+                  option.value = grade.id;
+                  option.textContent = grade.name;
+                  gradeSelect.appendChild(option);
+                });
+              }
+            });
+            
+            // 학년 선택 시 해당 학교와 학년의 반 목록 가져오기
+            const gradeSelect = document.getElementById("grade");
+            gradeSelect.addEventListener("change", function() {
+              const classSelect = document.getElementById("class");
+              
+              // 기존 반 옵션 제거 (첫 번째 옵션 제외)
+              while (classSelect.options.length > 1) {
+                classSelect.remove(1);
+              }
+              
+              const selectedSchool = schoolSelect.value;
+              const selectedGrade = this.value;
+              
+              if (selectedSchool && selectedGrade) {
+                // 임시 반 데이터 (실제로는 API에서 가져와야 함)
+                const classes = [
+                  { id: "class1", name: "1반" },
+                  { id: "class2", name: "2반" },
+                  { id: "class3", name: "3반" },
+                  { id: "class4", name: "4반" },
+                  { id: "class5", name: "5반" }
+                ];
+                
+                // 반 옵션 추가
+                classes.forEach(cls => {
+                  const option = document.createElement("option");
+                  option.value = cls.id;
+                  option.textContent = cls.name;
+                  classSelect.appendChild(option);
+                });
+              }
+            });
+          })
+          .catch(error => {
+            console.error('학교 목록 로드 오류:', error);
+            alert('학교 목록을 불러오는데 실패했습니다.');
+            
+            // 오류 시 기본 데이터 사용
+            const defaultSchools = [
+              { id: "school1", name: "OO고등학교" },
+              { id: "school2", name: "XX중학교" }
+            ];
+            
+            const schoolSelect = document.getElementById("school");
+            defaultSchools.forEach(school => {
+              const option = document.createElement("option");
+              option.value = school.id;
+              option.textContent = school.name;
+              schoolSelect.appendChild(option);
+            });
+          });
+      }
+      
+      // 알림 목록 가져오기
+      async function fetchAlerts() {
+        if (!selectedSchool || !selectedGrade || !selectedClass) return;
+        
+        try {
+          // 로딩 표시 보이기
+          const loadingElement = document.getElementById("alerts-loading");
+          const noAlertsMessage = document.getElementById("no-alerts-message");
+          const alertsList = document.getElementById("alerts-list");
+          
+          if (loadingElement) loadingElement.classList.remove("hidden");
+          if (noAlertsMessage) noAlertsMessage.classList.add("hidden");
+          
+          // 기존 알림 카드 제거
+          const existingAlerts = alertsList.querySelectorAll(".border.border-gray-200.rounded-md");
+          existingAlerts.forEach(alert => alert.remove());
+          
+          let url = `${API_BASE_URL}/alerts?school=${selectedSchool}&grade=${selectedGrade}&class=${selectedClass}`;
+          
+          // 최대 3개만 가져오기 (홈 화면용)
+          url += "&limit=3";
+          
+          // 인증 토큰 추가
+          const headers = {};
+          const token = localStorage.getItem('token');
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const response = await fetch(url, { headers });
+          if (!response.ok) {
+            throw new Error("알림을 가져오는데 실패했습니다.");
+          }
+          
+          alerts = await response.json();
+          
+          // 로딩 표시 숨기기
+          if (loadingElement) loadingElement.classList.add("hidden");
+          
+          renderAlerts(alerts);
+          updateCalendarEvents();
+        } catch (error) {
+          console.error("알림 가져오기 오류:", error);
+          
+          // 로딩 표시 숨기기
+          const loadingElement = document.getElementById("alerts-loading");
+          if (loadingElement) loadingElement.classList.add("hidden");
+          
+          // 오류 메시지 표시
+          const alertsList = document.getElementById("alerts-list");
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "text-center py-4 text-red-500";
+          errorMessage.textContent = "알림을 불러오는 중 오류가 발생했습니다.";
+          alertsList.appendChild(errorMessage);
+        }
+      }
+      
+      // 알림 목록 렌더링
+      function renderAlerts(alerts) {
+        const alertsContainer = document.getElementById("alerts-list");
+        const loadingElement = document.getElementById("alerts-loading");
+        const noAlertsMessage = document.getElementById("no-alerts-message");
+        
+        // 로딩 표시 숨기기
+        if (loadingElement) loadingElement.classList.add("hidden");
+        
+        // 기존 알림 카드 제거
+        const existingAlerts = alertsContainer.querySelectorAll(".border.border-gray-200.rounded-md");
+        existingAlerts.forEach(alert => alert.remove());
+        
+        // 알림이 없는 경우
+        if (alerts.length === 0) {
+          if (noAlertsMessage) noAlertsMessage.classList.remove("hidden");
+          return;
+        } else {
+          if (noAlertsMessage) noAlertsMessage.classList.add("hidden");
+        }
+        
+        // 최대 3개의 알림만 표시하도록 제한
+        const limitedAlerts = alerts.slice(0, 3);
+        
+        // 알림 카드 추가
+        limitedAlerts.forEach(alert => {
+          const alertCard = document.createElement("div");
+          alertCard.className = "border border-gray-200 rounded-md p-4 hover:shadow-md transition cursor-pointer";
+          alertCard.dataset.id = alert._id;
+          
+          // 날짜 포맷팅
+          const date = new Date(alert.date);
+          const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          
+          // 작성자 정보 표시
+          const authorText = alert.isAnonymous ? 
+            `<span class="text-gray-500 text-xs">(${alert.authorName})</span>` : 
+            '';
+          
+          alertCard.innerHTML = `
+            <div class="flex justify-between">
+              <span class="text-gray-500 text-sm">${formattedDate}</span>
+            </div>
+            <h3 class="font-medium mt-2">${alert.title} ${authorText}</h3>
+            <div class="flex justify-end mt-2">
+              <button class="text-gray-500 text-sm hover:text-primary mr-2 edit-btn" data-id="${alert._id}">
+                <i class="far fa-edit mr-1"></i> 수정
+              </button>
+              <button class="text-gray-500 text-sm hover:text-danger delete-btn" data-id="${alert._id}">
+                <i class="far fa-trash-alt mr-1"></i> 삭제
+              </button>
+            </div>
+          `;
+          
+          alertsContainer.appendChild(alertCard);
+          
+          // 알림 카드 클릭 이벤트 (상세 보기 모달 열기)
+          alertCard.addEventListener("click", function(e) {
+            // 버튼 클릭은 무시 (버튼에 자체 이벤트 핸들러가 있음)
+            if (e.target.closest('button')) return;
+            
+            openAlertDetailModal(alert);
+          });
+          
+          // 수정 버튼 이벤트
+          const editButton = alertCard.querySelector('.edit-btn');
+          editButton.addEventListener("click", function(e) {
+            e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+            window.location.href = `alerts.html?edit=${alert._id}`;
+          });
+          
+          // 삭제 버튼 이벤트
+          const deleteButton = alertCard.querySelector('.delete-btn');
+          deleteButton.addEventListener("click", function(e) {
+            e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+            deleteAlert(alert._id);
+          });
+        });
+      }
+      
+      // 알림 삭제
+      async function deleteAlert(id) {
+        if (!confirm("정말로 이 알림을 삭제하시겠습니까?")) return;
+        
+        try {
+          // 인증 토큰 추가
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+          const token = localStorage.getItem('token');
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          } else {
+            throw new Error("로그인이 필요합니다.");
+          }
+          
+          const response = await fetch(`${API_BASE_URL}/alerts/${id}`, {
+            method: "DELETE",
+            headers
+          });
+          
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || "알림 삭제에 실패했습니다.");
+          }
+          
+          // 성공 시 목록 새로고침
+          fetchAlerts();
+        } catch (error) {
+          console.error("알림 삭제 오류:", error);
+          alert(error.message || "알림 삭제 중 오류가 발생했습니다.");
+        }
+      }
+      
+      // 캘린더 이벤트 업데이트
+      function updateCalendarEvents() {
+        // 모든 날짜에서 이벤트 표시 제거
+        document.querySelectorAll(".calendar-day").forEach(day => {
+          day.classList.remove("has-event");
+          const eventDot = day.querySelector("span");
+          if (eventDot) eventDot.remove();
+        });
+        
+        // 현재 표시 중인 월/년 가져오기
+        const currentYear = currentCalendarDate.getFullYear();
+        const currentMonth = currentCalendarDate.getMonth();
+        
+        // 알림이 있는 날짜에 이벤트 표시 추가
+        alerts.forEach(alert => {
+          const date = new Date(alert.date);
+          
+          // 현재 표시 중인 월/년에 해당하는 알림만 처리
+          if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+            const day = date.getDate();
+            
+            // 현재 월의 날짜만 처리 (텍스트 내용으로 비교)
+            const calendarDays = document.querySelectorAll('.calendar-day:not(.text-gray-400)');
+            let calendarDay = null;
+            
+            // 텍스트 내용이 일치하는 날짜 요소 찾기
+            calendarDays.forEach(dayElement => {
+              if (dayElement.textContent.trim() === String(day)) {
+                calendarDay = dayElement;
+              }
+            });
+            
+            if (calendarDay) {
+              calendarDay.classList.add("has-event");
+              
+              // 이벤트 표시 점 추가
+              if (!calendarDay.querySelector("span")) {
+                const eventDot = document.createElement("span");
+                
+                // 기본 색상 설정
+                let dotColor = "bg-blue-500";
+                
+                eventDot.className = `absolute top-0 right-0 w-2 h-2 ${dotColor} rounded-full`;
+                calendarDay.appendChild(eventDot);
+              }
+            }
+          }
+        });
+      }
+      
+      // 캘린더 생성 함수
+      function generateCalendar(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        
+        // 한글 월 이름
+        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+        
+        // 캘린더 헤더 업데이트
+        const calendarHeader = document.querySelector("#content-calendar h2");
+        if (calendarHeader) {
+          calendarHeader.textContent = `${year}년 ${monthNames[month]}`;
+        }
+        
+        // 해당 월의 첫 날과 마지막 날 구하기
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        // 첫 날의 요일 (0: 일요일, 6: 토요일)
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // 이전 달의 마지막 날 구하기
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+        
+        // 캘린더 그리드 생성
+        const calendarGrid = document.querySelector("#content-calendar .grid.grid-cols-7.gap-2.text-center.mb-4");
+        if (!calendarGrid) return;
+        
+        // 요일 헤더를 제외한 기존 날짜 요소 제거
+        const dayElements = calendarGrid.querySelectorAll(".py-1");
+        dayElements.forEach(el => el.remove());
+        
+        // 이전 달의 날짜 추가
+        for (let i = 0; i < firstDayOfWeek; i++) {
+          const day = prevMonthLastDay - firstDayOfWeek + i + 1;
+          const dayElement = document.createElement("div");
+          dayElement.className = "py-1";
+          dayElement.innerHTML = `<div class="calendar-day text-gray-400">${day}</div>`;
+          calendarGrid.appendChild(dayElement);
+        }
+        
+        // 현재 달의 날짜 추가
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+          const dayElement = document.createElement("div");
+          dayElement.className = "py-1";
+          dayElement.innerHTML = `<div class="calendar-day">${i}</div>`;
+          calendarGrid.appendChild(dayElement);
+        }
+        
+        // 다음 달의 날짜 추가 (42개 셀을 채우기 위해)
+        const totalCells = 42;
+        const remainingCells = totalCells - firstDayOfWeek - lastDay.getDate();
+        for (let i = 1; i <= remainingCells; i++) {
+          const dayElement = document.createElement("div");
+          dayElement.className = "py-1";
+          dayElement.innerHTML = `<div class="calendar-day text-gray-400">${i}</div>`;
+          calendarGrid.appendChild(dayElement);
+        }
+        
+        // 날짜 클릭 이벤트 추가
+        const calendarDays = document.querySelectorAll(".calendar-day");
+        calendarDays.forEach((day) => {
+          day.addEventListener("click", function () {
+            // 이전에 선택된 날짜의 active 클래스 제거
+            document
+              .querySelectorAll(".calendar-day.active")
+              .forEach((activeDay) => {
+                activeDay.classList.remove("active");
+              });
+            // 클릭한 날짜에 active 클래스 추가
+            this.classList.add("active");
+            
+            // 선택한 날짜의 일정 표시
+            const dayNumber = this.textContent.trim();
+            if (!isNaN(dayNumber) && dayNumber > 0 && dayNumber <= 31) {
+              // 회색 날짜(이전/다음 달)는 처리하지 않음
+              if (!this.classList.contains('text-gray-400')) {
+                showDayEvents(dayNumber);
+              }
+            }
+          });
+        });
+        
+        // 이벤트 표시 업데이트
+        updateCalendarEvents();
+        
+        // 첫 번째 날짜 선택 (기본값)
+        const firstActiveDay = document.querySelector('.calendar-day:not(.text-gray-400)');
+        if (firstActiveDay) {
+          firstActiveDay.click();
+        }
+      }
+      
+      // 특정 날짜의 일정 표시
+      function showDayEvents(day) {
+        const eventsContainer = document.querySelector(".border-t.border-gray-200.pt-4.mt-2");
+        const eventsTitle = eventsContainer.querySelector("h3");
+        const eventsContent = document.getElementById("day-events");
+        const noEventsMessage = document.getElementById("no-day-events");
+        
+        // 현재 표시 중인 월/년 가져오기
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+        
+        // 한글 월 이름
+        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+        
+        // 제목 업데이트 (현재 표시 중인 월 반영)
+        eventsTitle.textContent = `${year}년 ${monthNames[month]} ${day}일 일정`;
+        
+        // 기존 일정 제거 (메시지 제외)
+        const existingEvents = eventsContent.querySelectorAll(".flex.items-start");
+        existingEvents.forEach(event => event.remove());
+        
+        // 해당 날짜의 알림 필터링 (현재 표시 중인 월/년 고려)
+        const dayEvents = alerts.filter(alert => {
+          const date = new Date(alert.date);
+          return date.getDate() == day && 
+                 date.getMonth() == month && 
+                 date.getFullYear() == year;
+        });
+        
+        // 일정이 없는 경우
+        if (dayEvents.length === 0) {
+          noEventsMessage.classList.remove("hidden");
+          return;
+        } else {
+          noEventsMessage.classList.add("hidden");
+        }
+        
+        // 일정 추가
+        dayEvents.forEach(event => {
+          const eventItem = document.createElement("div");
+          eventItem.className = "flex items-start";
+          
+          // 기본 색상 설정
+          let dotColor = "bg-blue-500";
+          
+          eventItem.innerHTML = `
+            <div class="w-2 h-2 ${dotColor} rounded-full mt-2 mr-2"></div>
+            <div>
+              <p class="font-medium">${event.title}</p>
+              <p class="text-sm text-gray-600">${event.description}</p>
+            </div>
+          `;
+          
+          eventsContent.appendChild(eventItem);
+        });
+      }
+      
+      // 알림 상세 보기 모달 열기
+      function openAlertDetailModal(alert) {
+        const modal = document.getElementById('alert-detail-modal');
+        const modalTitle = document.getElementById('modal-alert-title');
+        const modalDate = document.getElementById('modal-alert-date');
+        const modalDescription = document.getElementById('modal-alert-description');
+        const modalAuthor = document.getElementById('modal-alert-author');
+        const modalEditBtn = document.getElementById('modal-edit-btn');
+        const modalDeleteBtn = document.getElementById('modal-delete-btn');
+        const modalShareBtn = document.getElementById('modal-share-btn');
+        
+        // 모달 내용 채우기
+        modalTitle.textContent = alert.title;
+        
+        // 날짜 포맷팅
+        const date = new Date(alert.date);
+        const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+        modalDate.textContent = formattedDate;
+        
+        // 설명
+        modalDescription.textContent = alert.description;
+        
+        // 작성자 정보
+        if (alert.isAnonymous && alert.authorName) {
+          modalAuthor.textContent = `작성자: ${alert.authorName}`;
+        } else {
+          modalAuthor.textContent = '';
+        }
+        
+        // 버튼 이벤트 설정
+        modalEditBtn.onclick = function() {
+          window.location.href = `alerts.html?edit=${alert._id}`;
+        };
+        
+        modalDeleteBtn.onclick = function() {
+          modal.classList.add('hidden');
+          deleteAlert(alert._id);
+        };
+        
+        modalShareBtn.onclick = function() {
+          // 공유 텍스트 생성
+          const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${formattedDate}\n내용: ${alert.description}`;
+          
+          // 클립보드에 복사
+          navigator.clipboard.writeText(shareText)
+            .then(() => {
+              alert("알림 정보가 클립보드에 복사되었습니다.");
+            })
+            .catch(err => {
+              console.error('클립보드 복사 실패:', err);
+              alert("클립보드 복사에 실패했습니다.");
+            });
+        };
+        
+        // 모달 닫기 버튼
+        const closeModalBtn = document.getElementById('close-detail-modal');
+        closeModalBtn.onclick = function() {
+          modal.classList.add('hidden');
+        };
+        
+        // 모달 외부 클릭 시 닫기
+        modal.onclick = function(e) {
+          if (e.target === modal) {
+            modal.classList.add('hidden');
+          }
+        };
+        
+        // 모달 표시
+        modal.classList.remove('hidden');
+      }
+      
+      // 문자열에 특정 텍스트가 포함되어 있는지 확인하는 유틸리티 함수
+      Element.prototype.contains = function(text) {
+        return this.textContent.trim() === text;
+      };
+
+      // Todo 관련 이벤트 리스너 설정
+      function setupTodoListeners() {
+        const saveMemoBtn = document.getElementById("save-memo-btn");
+        const memoContent = document.getElementById("memo-content");
+        const memoLastSaved = document.getElementById("memo-last-saved");
+        
+        // 페이지 로드 시 저장된 메모 불러오기
+        loadMemo();
+        
+        // 저장 버튼 클릭
+        saveMemoBtn.addEventListener("click", function() {
+          saveMemo();
+        });
+        
+        // 자동 저장 (5초마다)
+        setInterval(function() {
+          saveMemo(true); // true는 자동 저장임을 나타냄
+        }, 5000);
+        
+        // 메모 저장 함수
+        function saveMemo(isAutoSave = false) {
+          const content = memoContent.value;
+          
+          // 메모 객체 생성
+          const memo = {
+            content: content,
+            lastSaved: new Date().toISOString()
+          };
+          
+          // 로컬 스토리지에 저장
+          localStorage.setItem('memo', JSON.stringify(memo));
+          
+          // 마지막 저장 시간 업데이트
+          updateLastSavedTime(memo.lastSaved);
+          
+          // 자동 저장이 아닌 경우에만 알림 표시
+          if (!isAutoSave) {
+            // 저장 성공 알림
+            const saveNotification = document.createElement("div");
+            saveNotification.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-md z-50";
+            saveNotification.textContent = "메모가 저장되었습니다.";
+            document.body.appendChild(saveNotification);
+            
+            // 2초 후 알림 제거
+            setTimeout(function() {
+              saveNotification.remove();
+            }, 2000);
+          }
+        }
+        
+        // 마지막 저장 시간 업데이트
+        function updateLastSavedTime(timestamp) {
+          const date = new Date(timestamp);
+          const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+          memoLastSaved.textContent = `마지막 저장: ${formattedDate}`;
+        }
+      }
+      
+      // 저장된 메모 불러오기
+      function loadMemo() {
+        const memoContent = document.getElementById("memo-content");
+        const memoLastSaved = document.getElementById("memo-last-saved");
+        
+        // 로컬 스토리지에서 메모 가져오기
+        const memoJson = localStorage.getItem('memo');
+        
+        if (memoJson) {
+          try {
+            const memo = JSON.parse(memoJson);
+            
+            // 메모 내용 설정
+            memoContent.value = memo.content || '';
+            
+            // 마지막 저장 시간 업데이트
+            if (memo.lastSaved) {
+              const date = new Date(memo.lastSaved);
+              const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+              memoLastSaved.textContent = `마지막 저장: ${formattedDate}`;
+            }
+          } catch (error) {
+            console.error('메모 파싱 오류:', error);
+          }
+        }
+      }
+      
+      // 팁 게시판 관련 이벤트 리스너 설정
+      function setupTipsListeners() {
+        const addTipBtn = document.getElementById("add-tip-btn");
+        const tipForm = document.getElementById("tip-form");
+        const cancelTipBtn = document.getElementById("cancel-tip-btn");
+        const saveTipBtn = document.getElementById("save-tip-btn");
+        const tipContent = document.getElementById("tip-content");
+        const tipAuthor = document.getElementById("tip-author");
+        
+        // 새 팁 작성 버튼 클릭
+        addTipBtn.addEventListener("click", function() {
+          tipForm.classList.remove("hidden");
+          tipContent.value = "";
+          tipAuthor.value = "";
+          
+          // 입력 필드에 포커스
+          tipContent.focus();
+        });
+        
+        // 취소 버튼 클릭
+        cancelTipBtn.addEventListener("click", function() {
+          tipForm.classList.add("hidden");
+        });
+        
+        // 저장 버튼 클릭
+        saveTipBtn.addEventListener("click", function() {
+          const content = tipContent.value.trim();
+          const authorName = tipAuthor.value.trim();
+          
+          if (!content) {
+            alert("내용을 입력해주세요.");
+            return;
+          }
+          
+          // 학교/학년/반 정보 확인
+          if (!selectedSchool || !selectedGrade || !selectedClass) {
+            alert("학교, 학년, 반 정보가 필요합니다.");
+            return;
+          }
+          
+          // 새 팁 저장
+          saveTip(content, authorName);
+          
+          // 폼 숨기기
+          tipForm.classList.add("hidden");
+        });
+        
+        // 팁 상세 모달 닫기 버튼
+        const closeTipModalBtn = document.getElementById("close-tip-modal");
+        closeTipModalBtn.addEventListener("click", function() {
+          const tipDetailModal = document.getElementById("tip-detail-modal");
+          tipDetailModal.classList.add("hidden");
+        });
+        
+        // 팁 좋아요 버튼
+        const tipLikeBtn = document.getElementById("tip-like-btn");
+        tipLikeBtn.addEventListener("click", function() {
+          const tipId = this.dataset.tipId;
+          if (tipId) {
+            likeTip(tipId);
+          }
+        });
+        
+        // 댓글 저장 버튼
+        const saveCommentBtn = document.getElementById("save-comment-btn");
+        saveCommentBtn.addEventListener("click", function() {
+          const commentContent = document.getElementById("comment-content").value.trim();
+          const commentAuthor = document.getElementById("comment-author").value.trim();
+          const tipId = tipLikeBtn.dataset.tipId;
+          
+          if (!commentContent) {
+            alert("댓글 내용을 입력해주세요.");
+            return;
+          }
+          
+          if (tipId) {
+            saveComment(tipId, commentContent, commentAuthor);
+          }
+        });
+        
+        // 팁 삭제 버튼
+        const tipDeleteBtn = document.getElementById("tip-delete-btn");
+        tipDeleteBtn.addEventListener("click", function() {
+          const tipId = tipLikeBtn.dataset.tipId;
+          if (tipId) {
+            deleteTip(tipId);
+          }
+        });
+      }
+      
+      // 팁 목록 로드
+      function loadTips() {
+        // 학교/학년/반 정보 확인
+        if (!selectedSchool || !selectedGrade || !selectedClass) {
+          const tipsLoading = document.getElementById("tips-loading");
+          const noTipsMessage = document.getElementById("no-tips-message");
+          
+          if (tipsLoading) tipsLoading.classList.add("hidden");
+          if (noTipsMessage) noTipsMessage.classList.remove("hidden");
+          return;
+        }
+        
+        const tipsContainer = document.getElementById("tips-list");
+        const tipsLoading = document.getElementById("tips-loading");
+        const noTipsMessage = document.getElementById("no-tips-message");
+        
+        // 로딩 표시 보이기
+        if (tipsLoading) tipsLoading.classList.remove("hidden");
+        if (noTipsMessage) noTipsMessage.classList.add("hidden");
+        
+        // 기존 팁 카드 제거
+        const existingTips = tipsContainer.querySelectorAll(".tip-card, .comment-item");
+        existingTips.forEach(tip => tip.remove());
+        
+        // API 요청 URL 생성
+        const url = `${API_BASE_URL}/tips?school=${selectedSchool}&grade=${selectedGrade}&class=${selectedClass}`;
+        
+        // 팁 목록 가져오기
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("팁 목록을 가져오는데 실패했습니다.");
+            }
+            return response.json();
+          })
+          .then(tips => {
+            // 로딩 표시 숨기기
+            if (tipsLoading) tipsLoading.classList.add("hidden");
+            
+            // 팁이 없는 경우
+            if (tips.length === 0) {
+              if (noTipsMessage) noTipsMessage.classList.remove("hidden");
+              return;
+            } else {
+              if (noTipsMessage) noTipsMessage.classList.add("hidden");
+            }
+            
+            // 팁 목록 렌더링 (최신순으로 정렬)
+            tips.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .forEach(tip => {
+              const tipCard = createTipElement(tip);
+              tipsContainer.appendChild(tipCard);
+              
+              // 댓글 맵 생성 (중첩 구조를 위해)
+              const commentMap = {};
+              if (tip.comments && tip.comments.length > 0) {
+                // 댓글 맵 생성
+                tip.comments.forEach(comment => {
+                  commentMap[comment._id] = comment;
+                  comment.children = [];
+                });
+                
+                // 댓글 트리 구성
+                const rootComments = [];
+                tip.comments.forEach(comment => {
+                  if (comment.parentId && commentMap[comment.parentId]) {
+                    commentMap[comment.parentId].children.push(comment);
+                  } else {
+                    rootComments.push(comment);
+                  }
+                });
+                
+                // 루트 댓글 렌더링
+                rootComments.forEach(comment => {
+                  const commentElement = createCommentElement(comment, tip._id);
+                  tipsContainer.appendChild(commentElement);
+                  
+                  // 중첩 댓글 렌더링
+                  renderNestedComments(comment.children, tip._id, tipsContainer);
+                });
+              }
+            });
+          })
+          .catch(error => {
+            console.error("팁 목록 로드 오류:", error);
+            
+            // 로딩 표시 숨기기
+            if (tipsLoading) tipsLoading.classList.add("hidden");
+            
+            // 오류 메시지 표시
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "text-center py-4 text-red-500";
+            errorMessage.textContent = "팁을 불러오는 중 오류가 발생했습니다.";
+            tipsContainer.appendChild(errorMessage);
+          });
+      }
+      
+      // 중첩 댓글 렌더링
+      function renderNestedComments(comments, tipId, container) {
+        if (!comments || comments.length === 0) return;
+        
+        comments.forEach(comment => {
+          // 더 깊은 들여쓰기로 표시
+          const nestedCommentItem = document.createElement("div");
+          nestedCommentItem.className = "comment-item p-3 border-t border-gray-100 ml-12 pl-4 border-l-2 border-gray-200";
+          nestedCommentItem.dataset.id = comment._id;
+          nestedCommentItem.dataset.tipId = tipId;
+          
+          // 날짜 포맷팅
+          const date = new Date(comment.createdAt);
+          const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          
+          nestedCommentItem.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div class="flex-grow">
+                <p class="text-gray-700 text-sm">${comment.content}</p>
+                <div class="flex items-center mt-1">
+                  <span class="text-gray-500 text-xs">${comment.authorName || "익명"}</span>
+                  <span class="mx-1 text-gray-300">|</span>
+                  <span class="text-gray-500 text-xs">${formattedDate}</span>
+                </div>
+              </div>
+              <button class="delete-comment-btn text-gray-400 hover:text-red-500 text-xs" data-id="${comment._id}">
+                <i class="far fa-trash-alt"></i>
+              </button>
+            </div>
+          `;
+          
+          // 삭제 버튼 이벤트
+          setTimeout(() => {
+            const deleteBtn = nestedCommentItem.querySelector('.delete-comment-btn');
+            if (deleteBtn) {
+              deleteBtn.addEventListener('click', function() {
+                const commentId = this.dataset.id;
+                if (confirm("이 답글을 삭제하시겠습니까?")) {
+                  deleteComment(tipId, commentId);
+                }
+              });
+            }
+          }, 0);
+          
+          container.appendChild(nestedCommentItem);
+          
+          // 재귀적으로 더 깊은 중첩 댓글 렌더링
+          if (comment.children && comment.children.length > 0) {
+            renderNestedComments(comment.children, tipId, container);
+          }
+        });
+      }
+      
+      // 팁 요소 생성
+      function createTipElement(tip) {
+        const tipCard = document.createElement("div");
+        tipCard.className = "tip-card p-4 border border-gray-200 rounded-md hover:bg-gray-50 transition mb-3";
+        tipCard.dataset.id = tip._id;
+        
+        // 날짜 포맷팅
+        const date = new Date(tip.createdAt);
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
+        tipCard.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex-grow">
+              <p class="text-gray-700">${tip.content}</p>
+              <div class="flex items-center mt-2">
+                <span class="text-gray-500 text-sm font-medium">${tip.authorName || "익명"}</span>
+                <span class="mx-2 text-gray-300">|</span>
+                <span class="text-gray-500 text-sm">${formattedDate}</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <button class="like-btn flex items-center text-gray-500 hover:text-primary" data-id="${tip._id}">
+                <i class="far fa-thumbs-up mr-1"></i>
+                <span>${tip.likes || 0}</span>
+              </button>
+              <button class="reply-btn flex items-center text-gray-500 hover:text-primary" data-id="${tip._id}">
+                <i class="far fa-comment mr-1"></i>
+                <span>답글</span>
+              </button>
+              <button class="delete-tip-btn text-gray-500 hover:text-red-500" data-id="${tip._id}">
+                <i class="far fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="reply-form-container mt-2" id="reply-form-${tip._id}" style="display: none;">
+            <div class="flex flex-col border-t border-gray-100 pt-2">
+              <textarea class="reply-content w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary text-sm" rows="2" placeholder="답글을 작성해주세요"></textarea>
+              <div class="flex justify-between items-center mt-2">
+                <input type="text" class="reply-author p-1 border border-gray-300 rounded-md focus:ring-primary focus:border-primary text-sm" placeholder="닉네임 (선택)">
+                <div class="flex space-x-2">
+                  <button class="cancel-reply-btn px-2 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-xs">취소</button>
+                  <button class="save-reply-btn px-2 py-1 bg-primary text-white rounded-md hover:bg-indigo-600 text-xs">답글 작성</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // 좋아요 버튼 이벤트
+        setTimeout(() => {
+          const likeBtn = tipCard.querySelector('.like-btn');
+          if (likeBtn) {
+            likeBtn.addEventListener('click', function() {
+              const tipId = this.dataset.id;
+              likeTip(tipId);
+            });
+          }
+          
+          // 답글 버튼 이벤트
+          const replyBtn = tipCard.querySelector('.reply-btn');
+          if (replyBtn) {
+            replyBtn.addEventListener('click', function() {
+              const tipId = this.dataset.id;
+              const replyForm = document.getElementById(`reply-form-${tipId}`);
+              
+              // 다른 열린 답글 폼 닫기
+              document.querySelectorAll('.reply-form-container').forEach(form => {
+                if (form.id !== `reply-form-${tipId}`) {
+                  form.style.display = 'none';
+                }
+              });
+              
+              // 토글
+              replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+              
+              // 포커스
+              if (replyForm.style.display === 'block') {
+                replyForm.querySelector('.reply-content').focus();
+              }
+            });
+          }
+          
+          // 취소 버튼 이벤트
+          const cancelBtn = tipCard.querySelector('.cancel-reply-btn');
+          if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+              const tipId = tipCard.dataset.id;
+              const replyForm = document.getElementById(`reply-form-${tipId}`);
+              replyForm.style.display = 'none';
+            });
+          }
+          
+          // 저장 버튼 이벤트
+          const saveBtn = tipCard.querySelector('.save-reply-btn');
+          if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+              const tipId = tipCard.dataset.id;
+              const replyForm = document.getElementById(`reply-form-${tipId}`);
+              const content = replyForm.querySelector('.reply-content').value.trim();
+              const authorName = replyForm.querySelector('.reply-author').value.trim();
+              
+              if (!content) {
+                alert("답글 내용을 입력해주세요.");
+                return;
+              }
+              
+              saveComment(tipId, content, authorName);
+              replyForm.style.display = 'none';
+            });
+          }
+          
+          // 삭제 버튼 이벤트
+          const deleteBtn = tipCard.querySelector('.delete-tip-btn');
+          if (deleteBtn) {
+            deleteBtn.addEventListener('click', function() {
+              const tipId = this.dataset.id;
+              if (confirm("정말로 이 팁을 삭제하시겠습니까?")) {
+                deleteTip(tipId);
+              }
+            });
+          }
+        }, 0);
+        
+        return tipCard;
+      }
+      
+      // 댓글 요소 생성
+      function createCommentElement(comment, tipId) {
+        const commentItem = document.createElement("div");
+        commentItem.className = "comment-item p-3 border-t border-gray-100 ml-8 pl-4 border-l-2 border-gray-200";
+        commentItem.dataset.id = comment._id;
+        commentItem.dataset.tipId = tipId;
+        
+        // 날짜 포맷팅
+        const date = new Date(comment.createdAt);
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
+        commentItem.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex-grow cursor-pointer comment-content">
+              <p class="text-gray-700 text-sm">${comment.content}</p>
+              <div class="flex items-center mt-1">
+                <span class="text-gray-500 text-xs">${comment.authorName || "익명"}</span>
+                <span class="mx-1 text-gray-300">|</span>
+                <span class="text-gray-500 text-xs">${formattedDate}</span>
+              </div>
+            </div>
+            <button class="delete-comment-btn text-gray-400 hover:text-red-500 text-xs" data-id="${comment._id}">
+              <i class="far fa-trash-alt"></i>
+            </button>
+          </div>
+          <div class="nested-reply-form mt-2" id="nested-reply-form-${comment._id}" style="display: none;">
+            <div class="flex flex-col border-t border-gray-100 pt-2 ml-4 pl-2 border-l border-gray-200">
+              <textarea class="nested-reply-content w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary text-sm" rows="2" placeholder="답글을 작성해주세요"></textarea>
+              <div class="flex justify-between items-center mt-2">
+                <input type="text" class="nested-reply-author p-1 border border-gray-300 rounded-md focus:ring-primary focus:border-primary text-sm" placeholder="닉네임 (선택)">
+                <div class="flex space-x-2">
+                  <button class="cancel-nested-reply-btn px-2 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-xs">취소</button>
+                  <button class="save-nested-reply-btn px-2 py-1 bg-primary text-white rounded-md hover:bg-indigo-600 text-xs">답글 작성</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // 댓글 클릭 이벤트 (답글 폼 표시)
+        setTimeout(() => {
+          const commentContent = commentItem.querySelector('.comment-content');
+          if (commentContent) {
+            commentContent.addEventListener('click', function() {
+              const commentId = commentItem.dataset.id;
+              const nestedReplyForm = document.getElementById(`nested-reply-form-${commentId}`);
+              
+              // 다른 열린 답글 폼 닫기
+              document.querySelectorAll('.nested-reply-form').forEach(form => {
+                if (form.id !== `nested-reply-form-${commentId}`) {
+                  form.style.display = 'none';
+                }
+              });
+              
+              // 토글
+              nestedReplyForm.style.display = nestedReplyForm.style.display === 'none' ? 'block' : 'none';
+              
+              // 포커스
+              if (nestedReplyForm.style.display === 'block') {
+                nestedReplyForm.querySelector('.nested-reply-content').focus();
+              }
+            });
+          }
+          
+          // 취소 버튼 이벤트
+          const cancelBtn = commentItem.querySelector('.cancel-nested-reply-btn');
+          if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+              const commentId = commentItem.dataset.id;
+              const nestedReplyForm = document.getElementById(`nested-reply-form-${commentId}`);
+              nestedReplyForm.style.display = 'none';
+            });
+          }
+          
+          // 저장 버튼 이벤트
+          const saveBtn = commentItem.querySelector('.save-nested-reply-btn');
+          if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+              const commentId = commentItem.dataset.id;
+              const tipId = commentItem.dataset.tipId;
+              const nestedReplyForm = document.getElementById(`nested-reply-form-${commentId}`);
+              const content = nestedReplyForm.querySelector('.nested-reply-content').value.trim();
+              const authorName = nestedReplyForm.querySelector('.nested-reply-author').value.trim();
+              
+              if (!content) {
+                alert("답글 내용을 입력해주세요.");
+                return;
+              }
+              
+              saveNestedComment(tipId, content, authorName, commentId);
+              nestedReplyForm.style.display = 'none';
+            });
+          }
+          
+          // 삭제 버튼 이벤트
+          const deleteBtn = commentItem.querySelector('.delete-comment-btn');
+          if (deleteBtn) {
+            deleteBtn.addEventListener('click', function(e) {
+              e.stopPropagation(); // 댓글 클릭 이벤트 전파 방지
+              const commentId = this.dataset.id;
+              const tipId = commentItem.dataset.tipId;
+              if (confirm("이 댓글을 삭제하시겠습니까?")) {
+                deleteComment(tipId, commentId);
+              }
+            });
+          }
+        }, 0);
+        
+        return commentItem;
+      }
+      
+      // 중첩 댓글 저장 (댓글에 대한 답글)
+      function saveNestedComment(tipId, content, authorName, parentCommentId) {
+        // API 요청 데이터 생성
+        const commentData = {
+          content,
+          parentId: parentCommentId
+        };
+        
+        // 작성자 이름이 있는 경우 추가
+        if (authorName) {
+          commentData.authorName = authorName;
+        }
+        
+        // API 요청
+        fetch(`${API_BASE_URL}/tips/${tipId}/comments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(commentData)
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("답글 저장에 실패했습니다.");
+            }
+            return response.json();
+          })
+          .then(savedComment => {
+            // 입력 필드 초기화
+            const nestedReplyForm = document.getElementById(`nested-reply-form-${parentCommentId}`);
+            if (nestedReplyForm) {
+              nestedReplyForm.querySelector('.nested-reply-content').value = "";
+              nestedReplyForm.querySelector('.nested-reply-author').value = "";
+            }
+            
+            // 팁 목록 새로고침
+            loadTips();
+          })
+          .catch(error => {
+            console.error("답글 저장 오류:", error);
+            alert("답글 저장 중 오류가 발생했습니다.");
+          });
+      }
+      
+      // 새 팁 저장
+      function saveTip(content, authorName) {
+        // 학교/학년/반 정보 확인
+        if (!selectedSchool || !selectedGrade || !selectedClass) {
+          alert("학교, 학년, 반 정보가 필요합니다.");
+          return;
+        }
+        
+        // API 요청 데이터 생성
+        const tipData = {
+          content,
+          school: selectedSchool,
+          grade: selectedGrade,
+          class: selectedClass
+        };
+        
+        // 작성자 이름이 있는 경우 추가
+        if (authorName) {
+          tipData.authorName = authorName;
+        }
+        
+        // API 요청
+        fetch(`${API_BASE_URL}/tips`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(tipData)
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("팁 저장에 실패했습니다.");
+            }
+            return response.json();
+          })
+          .then(savedTip => {
+            // 성공 메시지
+            alert("팁이 저장되었습니다.");
+            
+            // 팁 목록 새로고침
+            loadTips();
+          })
+          .catch(error => {
+            console.error("팁 저장 오류:", error);
+            alert("팁 저장 중 오류가 발생했습니다.");
+          });
+      }
+      
+      // 팁 좋아요
+      function likeTip(tipId) {
+        fetch(`${API_BASE_URL}/tips/${tipId}/like`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("좋아요 처리에 실패했습니다.");
+            }
+            return response.json();
+          })
+          .then(updatedTip => {
+            // 좋아요 수 업데이트
+            const likeBtn = document.querySelector(`.like-btn[data-id="${tipId}"]`);
+            if (likeBtn) {
+              const likeCount = likeBtn.querySelector('span');
+              likeCount.textContent = updatedTip.likes;
+            }
+          })
+          .catch(error => {
+            console.error("좋아요 처리 오류:", error);
+            alert("좋아요 처리 중 오류가 발생했습니다.");
+          });
+      }
+      
+      // 팁 삭제
+      function deleteTip(tipId) {
+        fetch(`${API_BASE_URL}/tips/${tipId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(err => {
+                throw new Error(err.message || "팁 삭제에 실패했습니다.");
+              });
+            }
+            return response.json();
+          })
+          .then(result => {
+            // 성공 메시지
+            alert("팁이 삭제되었습니다.");
+            
+            // 팁 목록 새로고침
+            loadTips();
+          })
+          .catch(error => {
+            console.error("팁 삭제 오류:", error);
+            alert(error.message || "팁 삭제 중 오류가 발생했습니다.");
+          });
+      }
+      
+      // 댓글 저장
+      function saveComment(tipId, content, authorName) {
+        // API 요청 데이터 생성
+        const commentData = {
+          content
+        };
+        
+        // 작성자 이름이 있는 경우 추가
+        if (authorName) {
+          commentData.authorName = authorName;
+        }
+        
+        // API 요청
+        fetch(`${API_BASE_URL}/tips/${tipId}/comments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(commentData)
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("댓글 저장에 실패했습니다.");
+            }
+            return response.json();
+          })
+          .then(savedComment => {
+            // 입력 필드 초기화
+            const replyForm = document.getElementById(`reply-form-${tipId}`);
+            if (replyForm) {
+              replyForm.querySelector('.reply-content').value = "";
+              replyForm.querySelector('.reply-author').value = "";
+            }
+            
+            // 팁 목록 새로고침
+            loadTips();
+          })
+          .catch(error => {
+            console.error("댓글 저장 오류:", error);
+            alert("댓글 저장 중 오류가 발생했습니다.");
+          });
+      }
+      
+      // 댓글 삭제
+      function deleteComment(tipId, commentId) {
+        fetch(`${API_BASE_URL}/tips/comments/${commentId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(err => {
+                throw new Error(err.message || "댓글 삭제에 실패했습니다.");
+              });
+            }
+            return response.json();
+          })
+          .then(result => {
+            // 성공 메시지
+            alert("댓글이 삭제되었습니다.");
+            
+            // 팁 목록 새로고침
+            loadTips();
+          })
+          .catch(error => {
+            console.error("댓글 삭제 오류:", error);
+            alert(error.message || "댓글 삭제 중 오류가 발생했습니다.");
+          });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 수행평가 알리미</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pretendard 폰트 -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css"
+    />
+    <!-- Font Awesome 아이콘 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+          "Noto Sans KR", "Malgun Gothic", sans-serif;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              secondary: "#10B981",
+              accent: "#F59E0B",
+              danger: "#EF4444",
+            },
+          },
+        },
+      };
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 헤더 -->
+    <header class="bg-white shadow-sm">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-primary">수행평가 알리미 - 관리자</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a href="index.html" class="text-gray-600 hover:text-primary">홈</a>
+            </li>
+            <li>
+              <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container mx-auto px-4 py-8">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- 사이드바 -->
+        <aside class="w-full md:w-64 bg-white rounded-lg shadow-md p-4">
+          <h2 class="text-lg font-semibold mb-4">관리자 메뉴</h2>
+          <nav>
+            <ul class="space-y-2">
+              <li>
+                <button id="schools-tab-btn" class="w-full text-left px-3 py-2 rounded-md bg-primary text-white">
+                  <i class="fas fa-school mr-2"></i>학교 관리
+                </button>
+              </li>
+              <li>
+                <button id="users-tab-btn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100">
+                  <i class="fas fa-users mr-2"></i>사용자 관리
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+
+        <!-- 콘텐츠 영역 -->
+        <div class="flex-1">
+          <!-- 학교 관리 탭 -->
+          <div id="schools-tab" class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">학교 관리</h2>
+              <button id="add-school-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600">
+                <i class="fas fa-plus mr-2"></i>학교 추가
+              </button>
+            </div>
+            
+            <!-- 학교 목록 -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="py-3 px-4 text-left">이름</th>
+                    <th class="py-3 px-4 text-left">주소</th>
+                    <th class="py-3 px-4 text-left">등록일</th>
+                    <th class="py-3 px-4 text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="schools-list">
+                  <!-- 학교 목록이 여기에 동적으로 추가됩니다 -->
+                  <tr>
+                    <td colspan="4" class="py-4 text-center text-gray-500">로딩 중...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 사용자 관리 탭 -->
+          <div id="users-tab" class="bg-white rounded-lg shadow-md p-6 hidden">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">사용자 관리</h2>
+            </div>
+            
+            <!-- 사용자 목록 -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="py-3 px-4 text-left">이름</th>
+                    <th class="py-3 px-4 text-left">이메일</th>
+                    <th class="py-3 px-4 text-left">학교</th>
+                    <th class="py-3 px-4 text-left">역할</th>
+                    <th class="py-3 px-4 text-left">가입일</th>
+                    <th class="py-3 px-4 text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="users-list">
+                  <!-- 사용자 목록이 여기에 동적으로 추가됩니다 -->
+                  <tr>
+                    <td colspan="6" class="py-4 text-center text-gray-500">로딩 중...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 학교 추가/수정 모달 -->
+    <div id="school-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="school-modal-title" class="text-xl font-semibold">학교 추가</h3>
+          <button id="close-school-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="school-form">
+          <input type="hidden" id="school-id">
+          <div class="mb-4">
+            <label for="school-name" class="block text-sm font-medium text-gray-700 mb-1">학교 이름</label>
+            <input type="text" id="school-name" class="w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div class="mb-4">
+            <label for="school-address" class="block text-sm font-medium text-gray-700 mb-1">주소</label>
+            <input type="text" id="school-address" class="w-full p-2 border border-gray-300 rounded-md">
+          </div>
+          <div class="mb-4">
+            <label for="school-description" class="block text-sm font-medium text-gray-700 mb-1">설명</label>
+            <textarea id="school-description" class="w-full p-2 border border-gray-300 rounded-md" rows="3"></textarea>
+          </div>
+          <div id="school-error" class="text-danger text-sm mb-4 hidden"></div>
+          <div class="flex justify-end">
+            <button type="button" id="cancel-school-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2">
+              취소
+            </button>
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md">
+              저장
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 사용자 수정 모달 -->
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold">사용자 정보 수정</h3>
+          <button id="close-user-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="user-form">
+          <input type="hidden" id="user-id">
+          <div class="mb-4">
+            <label for="user-name" class="block text-sm font-medium text-gray-700 mb-1">이름</label>
+            <input type="text" id="user-name" class="w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div class="mb-4">
+            <label for="user-email" class="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+            <input type="email" id="user-email" class="w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div class="mb-4">
+            <label for="user-school" class="block text-sm font-medium text-gray-700 mb-1">학교</label>
+            <select id="user-school" class="w-full p-2 border border-gray-300 rounded-md">
+              <option value="default_school">선택 안함</option>
+              <!-- 학교 목록이 여기에 동적으로 추가됩니다 -->
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="user-role" class="block text-sm font-medium text-gray-700 mb-1">역할</label>
+            <select id="user-role" class="w-full p-2 border border-gray-300 rounded-md">
+              <option value="user">일반 사용자</option>
+              <option value="admin">관리자</option>
+            </select>
+          </div>
+          <div id="user-error" class="text-danger text-sm mb-4 hidden"></div>
+          <div class="flex justify-end">
+            <button type="button" id="cancel-user-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2">
+              취소
+            </button>
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md">
+              저장
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class=" text-white hidden md:block">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+          </div>
+          <div>
+            <p class="text-sm text-black">
+              &copy; 2025 수행평가 알리미. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 자바스크립트 -->
+    <script>
+      // API 기본 URL
+      const API_BASE_URL = "http://localhost:5000/api";
+      
+      // DOM이 로드된 후 실행
+      document.addEventListener("DOMContentLoaded", function() {
+        // 관리자 인증 확인
+        checkAdminAuth();
+        
+        // 탭 전환 이벤트 리스너
+        document.getElementById('schools-tab-btn').addEventListener('click', function() {
+          showTab('schools');
+        });
+        
+        document.getElementById('users-tab-btn').addEventListener('click', function() {
+          showTab('users');
+        });
+        
+        // 로그아웃 버튼 이벤트 리스너
+        document.getElementById('logout-btn').addEventListener('click', function() {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+        });
+      });
+      
+      // 관리자 인증 확인
+      async function checkAdminAuth() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          // 토큰이 없으면 로그인 페이지로 리다이렉트
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        try {
+          // 사용자 정보 가져오기
+          const response = await fetch(`${API_BASE_URL}/users/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('인증에 실패했습니다.');
+          }
+          
+          const user = await response.json();
+          
+          // 관리자가 아니면 홈페이지로 리다이렉트
+          if (user.role !== 'admin') {
+            alert('관리자 권한이 필요합니다.');
+            window.location.href = 'index.html';
+            return;
+          }
+          
+          // 관리자 인증 성공 시 데이터 로드
+          loadSchools();
+          loadUsers();
+          
+        } catch (error) {
+          console.error('인증 오류:', error);
+          alert('인증에 실패했습니다. 다시 로그인해주세요.');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+        }
+      }
+      
+      // 탭 전환 함수
+      function showTab(tabName) {
+        // 모든 탭 버튼 비활성화
+        document.getElementById('schools-tab-btn').classList.remove('bg-primary', 'text-white');
+        document.getElementById('users-tab-btn').classList.remove('bg-primary', 'text-white');
+        document.getElementById('schools-tab-btn').classList.add('hover:bg-gray-100');
+        document.getElementById('users-tab-btn').classList.add('hover:bg-gray-100');
+        
+        // 모든 탭 내용 숨기기
+        document.getElementById('schools-tab').classList.add('hidden');
+        document.getElementById('users-tab').classList.add('hidden');
+        
+        // 선택한 탭 활성화
+        document.getElementById(`${tabName}-tab-btn`).classList.add('bg-primary', 'text-white');
+        document.getElementById(`${tabName}-tab-btn`).classList.remove('hover:bg-gray-100');
+        document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+      }
+      
+      // 학교 목록 로드
+      async function loadSchools() {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE_URL}/schools`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('학교 목록을 불러오는데 실패했습니다.');
+          }
+          
+          const schools = await response.json();
+          
+          // 학교 목록 테이블 업데이트
+          const schoolsList = document.getElementById('schools-list');
+          
+          if (schools.length === 0) {
+            schoolsList.innerHTML = `
+              <tr>
+                <td colspan="4" class="py-4 text-center text-gray-500">등록된 학교가 없습니다.</td>
+              </tr>
+            `;
+            return;
+          }
+          
+          schoolsList.innerHTML = schools.map(school => `
+            <tr>
+              <td class="py-3 px-4">${school.name}</td>
+              <td class="py-3 px-4">${school.address || '-'}</td>
+              <td class="py-3 px-4">${new Date(school.createdAt).toLocaleDateString()}</td>
+              <td class="py-3 px-4 text-center">
+                <button class="text-primary hover:text-indigo-700 mr-2" onclick="editSchool('${school._id}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-danger hover:text-red-700" onclick="deleteSchool('${school._id}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+          
+          // 사용자 수정 모달의 학교 선택 옵션 업데이트
+          const userSchoolSelect = document.getElementById('user-school');
+          userSchoolSelect.innerHTML = `
+            <option value="default_school">선택 안함</option>
+            ${schools.map(school => `<option value="${school.name}">${school.name}</option>`).join('')}
+          `;
+          
+        } catch (error) {
+          console.error('학교 목록 로드 오류:', error);
+          alert('학교 목록을 불러오는데 실패했습니다.');
+        }
+      }
+      
+      // 사용자 목록 로드
+      async function loadUsers() {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE_URL}/users`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('사용자 목록을 불러오는데 실패했습니다.');
+          }
+          
+          const users = await response.json();
+          
+          // 사용자 목록 테이블 업데이트
+          const usersList = document.getElementById('users-list');
+          
+          if (users.length === 0) {
+            usersList.innerHTML = `
+              <tr>
+                <td colspan="6" class="py-4 text-center text-gray-500">등록된 사용자가 없습니다.</td>
+              </tr>
+            `;
+            return;
+          }
+          
+          usersList.innerHTML = users.map(user => `
+            <tr>
+              <td class="py-3 px-4">${user.name}</td>
+              <td class="py-3 px-4">${user.email}</td>
+              <td class="py-3 px-4">${user.school || '-'}</td>
+              <td class="py-3 px-4">${user.role === 'admin' ? '관리자' : '일반 사용자'}</td>
+              <td class="py-3 px-4">${new Date(user.createdAt).toLocaleDateString()}</td>
+              <td class="py-3 px-4 text-center">
+                <button class="text-primary hover:text-indigo-700 mr-2" onclick="editUser('${user._id}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-danger hover:text-red-700" onclick="deleteUser('${user._id}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+          
+        } catch (error) {
+          console.error('사용자 목록 로드 오류:', error);
+          alert('사용자 목록을 불러오는데 실패했습니다.');
+        }
+      }
+      
+      // 학교 추가 모달 열기
+      document.getElementById('add-school-btn').addEventListener('click', function() {
+        document.getElementById('school-modal-title').textContent = '학교 추가';
+        document.getElementById('school-form').reset();
+        document.getElementById('school-id').value = '';
+        document.getElementById('school-error').classList.add('hidden');
+        document.getElementById('school-modal').classList.remove('hidden');
+      });
+      
+      // 학교 모달 닫기
+      document.getElementById('close-school-modal').addEventListener('click', function() {
+        document.getElementById('school-modal').classList.add('hidden');
+      });
+      
+      document.getElementById('cancel-school-btn').addEventListener('click', function() {
+        document.getElementById('school-modal').classList.add('hidden');
+      });
+      
+      // 사용자 모달 닫기
+      document.getElementById('close-user-modal').addEventListener('click', function() {
+        document.getElementById('user-modal').classList.add('hidden');
+      });
+      
+      document.getElementById('cancel-user-btn').addEventListener('click', function() {
+        document.getElementById('user-modal').classList.add('hidden');
+      });
+      
+      // 학교 수정 함수
+      async function editSchool(schoolId) {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE_URL}/schools/${schoolId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('학교 정보를 불러오는데 실패했습니다.');
+          }
+          
+          const school = await response.json();
+          
+          // 모달 필드 설정
+          document.getElementById('school-modal-title').textContent = '학교 수정';
+          document.getElementById('school-id').value = school._id;
+          document.getElementById('school-name').value = school.name;
+          document.getElementById('school-address').value = school.address || '';
+          document.getElementById('school-description').value = school.description || '';
+          
+          // 모달 표시
+          document.getElementById('school-error').classList.add('hidden');
+          document.getElementById('school-modal').classList.remove('hidden');
+          
+        } catch (error) {
+          console.error('학교 수정 오류:', error);
+          alert('학교 정보를 불러오는데 실패했습니다.');
+        }
+      }
+      
+      // 학교 삭제 함수
+      async function deleteSchool(schoolId) {
+        if (!confirm('정말로 이 학교를 삭제하시겠습니까?')) {
+          return;
+        }
+        
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE_URL}/schools/${schoolId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('학교 삭제에 실패했습니다.');
+          }
+          
+          // 학교 목록 새로고침
+          loadSchools();
+          
+        } catch (error) {
+          console.error('학교 삭제 오류:', error);
+          alert('학교 삭제에 실패했습니다.');
+        }
+      }
+      
+      // 사용자 수정 함수
+      async function editUser(userId) {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('사용자 정보를 불러오는데 실패했습니다.');
+          }
+          
+          const user = await response.json();
+          
+          // 모달 필드 설정
+          document.getElementById('user-id').value = user._id;
+          document.getElementById('user-name').value = user.name;
+          document.getElementById('user-email').value = user.email;
+          document.getElementById('user-school').value = user.school || 'default_school';
+          document.getElementById('user-role').value = user.role;
+          
+          // 모달 표시
+          document.getElementById('user-error').classList.add('hidden');
+          document.getElementById('user-modal').classList.remove('hidden');
+          
+        } catch (error) {
+          console.error('사용자 수정 오류:', error);
+          alert('사용자 정보를 불러오는데 실패했습니다.');
+        }
+      }
+      
+      // 사용자 삭제 함수
+      async function deleteUser(userId) {
+        if (!confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
+          return;
+        }
+        
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('사용자 삭제에 실패했습니다.');
+          }
+          
+          // 사용자 목록 새로고침
+          loadUsers();
+          
+        } catch (error) {
+          console.error('사용자 삭제 오류:', error);
+          alert('사용자 삭제에 실패했습니다.');
+        }
+      }
+      
+      // 학교 폼 제출 이벤트 리스너
+      document.getElementById('school-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const schoolId = document.getElementById('school-id').value;
+        const name = document.getElementById('school-name').value;
+        const address = document.getElementById('school-address').value;
+        const description = document.getElementById('school-description').value;
+        
+        if (!name) {
+          document.getElementById('school-error').textContent = '학교 이름은 필수 항목입니다.';
+          document.getElementById('school-error').classList.remove('hidden');
+          return;
+        }
+        
+        try {
+          const token = localStorage.getItem('token');
+          const url = schoolId 
+            ? `${API_BASE_URL}/schools/${schoolId}` 
+            : `${API_BASE_URL}/schools`;
+          const method = schoolId ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              name,
+              address,
+              description
+            })
+          });
+          
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || '학교 저장에 실패했습니다.');
+          }
+          
+          // 모달 닫기
+          document.getElementById('school-modal').classList.add('hidden');
+          
+          // 학교 목록 새로고침
+          loadSchools();
+          
+        } catch (error) {
+          console.error('학교 저장 오류:', error);
+          document.getElementById('school-error').textContent = error.message;
+          document.getElementById('school-error').classList.remove('hidden');
+        }
+      });
+      
+      // 사용자 폼 제출 이벤트 리스너
+      document.getElementById('user-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const userId = document.getElementById('user-id').value;
+        const name = document.getElementById('user-name').value;
+        const email = document.getElementById('user-email').value;
+        const school = document.getElementById('user-school').value;
+        const role = document.getElementById('user-role').value;
+        
+        if (!name || !email) {
+          document.getElementById('user-error').textContent = '이름과 이메일은 필수 항목입니다.';
+          document.getElementById('user-error').classList.remove('hidden');
+          return;
+        }
+        
+        try {
+          const token = localStorage.getItem('token');
+          
+          const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              school,
+              role
+            })
+          });
+          
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || '사용자 정보 저장에 실패했습니다.');
+          }
+          
+          // 모달 닫기
+          document.getElementById('user-modal').classList.add('hidden');
+          
+          // 사용자 목록 새로고침
+          loadUsers();
+          
+        } catch (error) {
+          console.error('사용자 정보 저장 오류:', error);
+          document.getElementById('user-error').textContent = error.message;
+          document.getElementById('user-error').classList.remove('hidden');
+        }
+      });
+    </script>
+</body>
+</html>

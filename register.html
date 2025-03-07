@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입 - 수행평가 알리미</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pretendard 폰트 -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css"
+    />
+    <!-- Font Awesome 아이콘 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+          "Noto Sans KR", "Malgun Gothic", sans-serif;
+      }
+      /* 모바일 하단 네비게이션 바를 위한 여백 */
+      .mobile-nav-padding {
+        padding-bottom: 4rem;
+      }
+      /* 모달 배경 */
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+      /* 모달 내용 */
+      .modal-content {
+        background-color: white;
+        border-radius: 0.5rem;
+        max-width: 90%;
+        width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              secondary: "#10B981",
+              accent: "#F59E0B",
+              danger: "#EF4444",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gray-50 min-h-screen mobile-nav-padding">
+    <!-- 헤더 - 데스크톱에서만 표시 -->
+    <header class="bg-white shadow-sm hidden md:block">
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
+        <nav>
+          <ul class="flex space-x-4">
+            <li>
+              <a href="index.html" class="text-gray-600 hover:text-primary"
+                >홈</a
+              >
+            </li>
+            <li>
+              <a href="alerts.html" class="text-gray-600 hover:text-primary"
+                >알리미</a
+              >
+            </li>
+            <li>
+              <a href="profile.html" class="text-gray-600 hover:text-primary"
+                >내 정보</a
+              >
+            </li>
+            <li>
+              <a href="login.html" class="text-gray-600 hover:text-primary"
+                >로그인</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- 모바일 헤더 - 모바일에서만 표시 -->
+    <header class="bg-white shadow-sm md:hidden">
+      <div class="container mx-auto px-4 py-4 flex justify-center items-center">
+        <h1 class="text-xl font-bold text-primary">수행평가 알리미</h1>
+      </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- 회원가입 섹션 -->
+      <section class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-6 text-center">회원가입</h2>
+
+        <form id="register-form" class="space-y-4">
+          <div>
+            <label
+              for="name"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >이름</label
+            >
+            <input
+              type="text"
+              id="name"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              placeholder="이름을 입력하세요"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >이메일</label
+            >
+            <div class="flex space-x-2">
+              <input
+                type="email"
+                id="email"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                placeholder="이메일을 입력하세요"
+                required
+              />
+              <button
+                type="button"
+                id="send-verification-btn"
+                class="bg-primary text-white py-2 px-4 rounded-md hover:bg-indigo-600 transition whitespace-nowrap"
+              >
+                인증 요청
+              </button>
+            </div>
+          </div>
+
+          <div id="verification-section" class="hidden">
+            <label
+              for="verification-code"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >인증 코드</label
+            >
+            <div class="flex space-x-2">
+              <input
+                type="text"
+                id="verification-code"
+                class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                placeholder="인증 코드 6자리를 입력하세요"
+                maxlength="6"
+                required
+              />
+              <button
+                type="button"
+                id="verify-code-btn"
+                class="bg-primary text-white py-2 px-4 rounded-md hover:bg-indigo-600 transition whitespace-nowrap"
+              >
+                인증 확인
+              </button>
+            </div>
+            <p class="mt-1 text-xs text-gray-500">
+              이메일로 전송된 6자리 인증 코드를 입력하세요. 인증 코드는 10분간 유효합니다.
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >비밀번호</label
+            >
+            <input
+              type="password"
+              id="password"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              placeholder="비밀번호를 입력하세요"
+              required
+            />
+            <p class="mt-1 text-xs text-gray-500">
+              8자 이상, 영문, 숫자, 특수문자 포함
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="password-confirm"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >비밀번호 확인</label
+            >
+            <input
+              type="password"
+              id="password-confirm"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              placeholder="비밀번호를 다시 입력하세요"
+              required
+            />
+          </div>
+
+          <div class="flex items-center">
+            <input
+              id="terms"
+              type="checkbox"
+              class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              required
+            />
+            <label for="terms" class="ml-2 block text-sm text-gray-700">
+              <button type="button" id="terms-btn" class="text-primary hover:underline">이용약관</button> 및
+              <button type="button" id="privacy-btn" class="text-primary hover:underline">개인정보 처리방침</button>에 동의합니다.
+            </label>
+          </div>
+
+          <div id="register-error" class="text-danger text-sm hidden"></div>
+
+          <button
+            type="submit"
+            class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-indigo-600 transition"
+          >
+            회원가입
+          </button>
+        </form>
+
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            이미 계정이 있으신가요?
+            <a href="login.html" class="text-primary hover:underline">로그인</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- 이용약관 모달 -->
+    <div id="terms-modal" class="modal-backdrop hidden">
+      <div class="modal-content p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold">이용약관</h3>
+          <button id="close-terms-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="prose prose-sm max-w-none">
+          <h4 class="text-lg font-medium mb-2">제1조 (목적)</h4>
+          <p class="mb-4">
+            이 약관은 수행평가 알리미 서비스(이하 "서비스")를 제공하는 회사(이하 "회사")와 
+            이를 이용하는 회원(이하 "회원") 간의 권리와 의무, 책임사항 및 기타 필요한 사항을 
+            규정함을 목적으로 합니다.
+          </p>
+          
+          <h4 class="text-lg font-medium mb-2">제2조 (약관의 효력 및 변경)</h4>
+          <p class="mb-4">
+            1. 이 약관은 서비스를 이용하고자 하는 모든 회원에게 적용됩니다.<br>
+            2. 회사는 필요한 경우 약관을 변경할 수 있으며, 변경된 약관은 서비스 내 공지사항에 
+            게시하거나 기타 방법으로 회원에게 공지함으로써 효력이 발생합니다.
+          </p>
+          
+          <h4 class="text-lg font-medium mb-2">제3조 (서비스의 내용)</h4>
+          <p class="mb-4">
+            회사가 제공하는 서비스는 다음과 같습니다:<br>
+            1. 수행평가 일정 관리 및 알림 서비스<br>
+            2. 학교 및 학급별 정보 공유 서비스<br>
+            3. 기타 회사가 추가 개발하거나 제휴를 통해 제공하는 서비스
+          </p>
+          
+          <h4 class="text-lg font-medium mb-2">제4조 (서비스 이용)</h4>
+          <p class="mb-4">
+            1. 서비스 이용은 회사의 업무상 또는 기술상 특별한 지장이 없는 한 연중무휴, 1일 24시간을 원칙으로 합니다.<br>
+            2. 회사는 시스템 정기점검, 증설 및 교체를 위해 서비스를 일시 중단할 수 있으며, 
+            예정된 작업으로 인한 서비스 일시 중단은 서비스 내 공지사항을 통해 사전에 공지합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 개인정보 처리방침 모달 -->
+    <div id="privacy-modal" class="modal-backdrop hidden">
+      <div class="modal-content p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold">개인정보 처리방침</h3>
+          <button id="close-privacy-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="prose prose-sm max-w-none">
+          <h4 class="text-lg font-medium mb-2">1. 수집하는 개인정보 항목</h4>
+          <p class="mb-4">
+            회사는 회원가입, 서비스 제공 등을 위해 다음과 같은 개인정보를 수집합니다:<br>
+            - 필수항목: 이름, 이메일 주소, 비밀번호, 학년, 반<br>
+            - 자동수집항목: IP 주소, 쿠키, 서비스 이용 기록, 접속 로그
+          </p>
+          
+          <h4 class="text-lg font-medium mb-2">2. 개인정보의 수집 및 이용목적</h4>
+          <p class="mb-4">
+            회사는 수집한 개인정보를 다음의 목적을 위해 이용합니다:<br>
+            - 회원 관리: 회원제 서비스 이용, 개인식별, 불량회원의 부정이용 방지<br>
+            - 서비스 제공: 수행평가 알림 서비스, 콘텐츠 제공<br>
+            - 마케팅 및 광고: 이벤트 정보 및 참여기회 제공, 서비스 개선을 위한 통계 활용
+          </p>
+          
+          <h4 class="text-lg font-medium mb-2">3. 개인정보의 보유 및 이용기간</h4>
+          <p class="mb-4">
+            회원의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다. 
+            단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 회사는 아래와 같이 관계법령에서 
+            정한 일정한 기간 동안 회원정보를 보관합니다.
+          </p>
+          
+          <h4 class="text-lg font-medium mb-2">4. 개인정보의 파기절차 및 방법</h4>
+          <p class="mb-4">
+            회사는 원칙적으로 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 
+            파기절차 및 방법은 다음과 같습니다:<br>
+            - 파기절차: 회원이 서비스 가입 등을 위해 입력한 정보는 목적이 달성된 후 별도의 DB로 옮겨져 
+            내부 방침 및 관련 법령에 의한 정보보호 사유에 따라 일정 기간 저장된 후 파기됩니다.<br>
+            - 파기방법: 전자적 파일 형태로 저장된 개인정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class=" text-white hidden md:block">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+          </div>
+          <div>
+            <p class="text-sm text-black">
+              &copy; 2025 수행평가 알리미. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 모바일 하단 네비게이션 바 -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200"
+    >
+      <div class="flex justify-around">
+        <a
+          href="index.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-home text-xl mb-1"></i>
+          <span class="text-xs">홈</span>
+        </a>
+        <a
+          href="alerts.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-clipboard-list text-xl mb-1"></i>
+          <span class="text-xs">알리미</span>
+        </a>
+        <a
+          href="profile.html"
+          class="flex flex-col items-center py-2 px-3 text-gray-600"
+        >
+          <i class="fas fa-user text-xl mb-1"></i>
+          <span class="text-xs">내 정보</span>
+        </a>
+        <a
+          href="login.html"
+          class="flex flex-col items-center py-2 px-3 text-primary"
+        >
+          <i class="fas fa-sign-in-alt text-xl mb-1"></i>
+          <span class="text-xs">로그인</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- 자바스크립트 -->
+    <script>
+      // API 기본 URL
+      const API_BASE_URL = "http://localhost:5000/api";
+      
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("회원가입 페이지가 로드되었습니다.");
+        
+        // 이미 로그인되어 있는지 확인
+        const token = localStorage.getItem('token');
+        if (token) {
+          // 이미 로그인된 상태면 홈페이지로 리다이렉트
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        // 모달 관련 요소
+        const termsModal = document.getElementById('terms-modal');
+        const privacyModal = document.getElementById('privacy-modal');
+        const termsBtn = document.getElementById('terms-btn');
+        const privacyBtn = document.getElementById('privacy-btn');
+        const closeTermsModal = document.getElementById('close-terms-modal');
+        const closePrivacyModal = document.getElementById('close-privacy-modal');
+        
+        // 이메일 인증 관련 요소
+        const emailInput = document.getElementById('email');
+        const sendVerificationBtn = document.getElementById('send-verification-btn');
+        const verificationSection = document.getElementById('verification-section');
+        const verificationCodeInput = document.getElementById('verification-code');
+        const verifyCodeBtn = document.getElementById('verify-code-btn');
+        
+        // 이메일 인증 상태
+        let isEmailVerified = false;
+        
+        // 이메일 인증 요청 버튼 클릭 이벤트
+        sendVerificationBtn.addEventListener('click', async function() {
+          const email = emailInput.value.trim();
+          
+          // 이메일 형식 검증
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            alert('유효한 이메일 주소를 입력해주세요.');
+            emailInput.focus();
+            return;
+          }
+          
+          try {
+            sendVerificationBtn.disabled = true;
+            sendVerificationBtn.textContent = '전송 중...';
+            
+            const response = await fetch(`${API_BASE_URL}/users/send-verification`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.message || '인증 코드 전송에 실패했습니다.');
+            }
+            
+            // 인증 코드 입력 섹션 표시
+            verificationSection.classList.remove('hidden');
+            alert('인증 코드가 이메일로 전송되었습니다. 이메일을 확인해주세요.');
+            verificationCodeInput.focus();
+            
+          } catch (error) {
+            console.error('인증 코드 전송 오류:', error);
+            alert(error.message);
+          } finally {
+            sendVerificationBtn.disabled = false;
+            sendVerificationBtn.textContent = '인증 요청';
+          }
+        });
+        
+        // 인증 코드 확인 버튼 클릭 이벤트
+        verifyCodeBtn.addEventListener('click', async function() {
+          const email = emailInput.value.trim();
+          const code = verificationCodeInput.value.trim();
+          
+          if (!code) {
+            alert('인증 코드를 입력해주세요.');
+            verificationCodeInput.focus();
+            return;
+          }
+          
+          try {
+            verifyCodeBtn.disabled = true;
+            verifyCodeBtn.textContent = '확인 중...';
+            
+            const response = await fetch(`${API_BASE_URL}/users/verify-email`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, code })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.message || '인증 코드 확인에 실패했습니다.');
+            }
+            
+            // 인증 성공
+            isEmailVerified = true;
+            emailInput.readOnly = true;
+            emailInput.classList.add('bg-gray-100');
+            sendVerificationBtn.disabled = true;
+            verifyCodeBtn.disabled = true;
+            verificationCodeInput.readOnly = true;
+            verificationCodeInput.classList.add('bg-gray-100');
+            
+            // 성공 메시지 표시
+            const successMessage = document.createElement('p');
+            successMessage.className = 'mt-1 text-xs text-green-500';
+            successMessage.textContent = '이메일 인증이 완료되었습니다.';
+            verificationSection.appendChild(successMessage);
+            
+            alert('이메일 인증이 완료되었습니다.');
+            
+          } catch (error) {
+            console.error('인증 코드 확인 오류:', error);
+            alert(error.message);
+          } finally {
+            verifyCodeBtn.disabled = false;
+            verifyCodeBtn.textContent = '인증 확인';
+          }
+        });
+        
+        // 이용약관 모달 열기
+        termsBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          termsModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden'; // 스크롤 방지
+        });
+        
+        // 개인정보 처리방침 모달 열기
+        privacyBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          privacyModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden'; // 스크롤 방지
+        });
+        
+        // 이용약관 모달 닫기
+        closeTermsModal.addEventListener('click', function() {
+          termsModal.classList.add('hidden');
+          document.body.style.overflow = ''; // 스크롤 복원
+        });
+        
+        // 개인정보 처리방침 모달 닫기
+        closePrivacyModal.addEventListener('click', function() {
+          privacyModal.classList.add('hidden');
+          document.body.style.overflow = ''; // 스크롤 복원
+        });
+        
+        // 모달 외부 클릭 시 닫기
+        window.addEventListener('click', function(e) {
+          if (e.target === termsModal) {
+            termsModal.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+          if (e.target === privacyModal) {
+            privacyModal.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        });
+
+        // 비밀번호 확인 검증
+        const password = document.getElementById("password");
+        const passwordConfirm = document.getElementById("password-confirm");
+        const registerForm = document.getElementById("register-form");
+        const registerError = document.getElementById("register-error");
+
+        registerForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          
+          // 이메일 인증 확인
+          if (!isEmailVerified) {
+            registerError.textContent = "이메일 인증이 필요합니다.";
+            registerError.classList.remove("hidden");
+            return;
+          }
+          
+          // 비밀번호 일치 확인
+          if (password.value !== passwordConfirm.value) {
+            registerError.textContent = "비밀번호가 일치하지 않습니다.";
+            registerError.classList.remove("hidden");
+            passwordConfirm.focus();
+            return;
+          }
+          
+          // 비밀번호 복잡성 검증
+          const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+          if (!passwordRegex.test(password.value)) {
+            registerError.textContent = "비밀번호는 8자 이상이며, 영문, 숫자, 특수문자를 포함해야 합니다.";
+            registerError.classList.remove("hidden");
+            password.focus();
+            return;
+          }
+          
+          // 약관 동의 확인
+          const termsCheckbox = document.getElementById("terms");
+          if (!termsCheckbox.checked) {
+            registerError.textContent = "이용약관 및 개인정보 처리방침에 동의해주세요.";
+            registerError.classList.remove("hidden");
+            return;
+          }
+          
+          // 회원가입 버튼 비활성화
+          const submitButton = registerForm.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+          submitButton.textContent = '회원가입 중...';
+          
+          // 에러 메시지 초기화
+          registerError.classList.add('hidden');
+          registerError.textContent = '';
+          
+          // 폼 데이터 수집
+          const name = document.getElementById('name').value;
+          const email = document.getElementById('email').value;
+          
+          try {
+            // API 호출
+            const response = await fetch(`${API_BASE_URL}/users/register`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+                name, 
+                email, 
+                password: password.value,
+                school: "default_school", // 기본값 설정
+                grade: "default_grade", // 기본값 설정
+                class: "default_class", // 기본값 설정
+                isVerified: isEmailVerified // 이메일 인증 상태 전달
+              })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.message || '회원가입에 실패했습니다.');
+            }
+            
+            // 회원가입 성공 처리
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // 홈페이지로 리다이렉트
+            window.location.href = 'index.html';
+          } catch (error) {
+            console.error('회원가입 오류:', error);
+            
+            // 에러 메시지 표시
+            registerError.textContent = error.message;
+            registerError.classList.remove('hidden');
+            
+            // 회원가입 버튼 활성화
+            submitButton.disabled = false;
+            submitButton.textContent = '회원가입';
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
