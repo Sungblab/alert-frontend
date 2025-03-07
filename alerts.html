@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>수행평가 알리미 - 알림 관리</title>
+    <title>학업 알리미 - 알림 관리</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#4f46e5" />
@@ -16,7 +16,7 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-    <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
+    <meta name="apple-mobile-web-app-title" content="학업 알리미" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/android-chrome-192x192" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -177,7 +177,7 @@
       <div
         class="container mx-auto px-4 py-4 flex justify-between items-center"
       >
-        <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
+        <h1 class="text-2xl font-bold text-primary">학업 알리미</h1>
         <div class="flex items-center space-x-4">
           <button
             id="install-button"
@@ -216,7 +216,7 @@
       <div
         class="container mx-auto px-4 py-4 flex justify-between items-center"
       >
-        <h1 class="text-xl font-bold text-primary">수행평가 알리미</h1>
+        <h1 class="text-xl font-bold text-primary">학업 알리미</h1>
       </div>
     </header>
 
@@ -628,13 +628,11 @@
       <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="mb-4 md:mb-0">
-            <h2 class="text-xl font-bold">수행평가 알리미</h2>
+            <h2 class="text-xl font-bold">학업 알리미</h2>
             <p class="text-sm mt-1">학교 생활을 더 편리하게</p>
           </div>
           <div>
-            <p class="text-sm">
-              &copy; 2025 수행평가 알리미. All rights reserved.
-            </p>
+            <p class="text-sm">&copy; 2025 학업 알리미. All rights reserved.</p>
           </div>
         </div>
       </div>
@@ -1694,7 +1692,7 @@
       // 알림 공유 기능
       function shareAlert(alert) {
         // 공유할 텍스트 생성
-        const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${new Date(
+        const shareText = `[학업 알리미] ${alert.title}\n마감일: ${new Date(
           alert.date
         ).toLocaleDateString()}\n내용: ${alert.description}`;
 
@@ -1702,7 +1700,7 @@
         if (navigator.share) {
           navigator
             .share({
-              title: `수행평가 알리미 - ${alert.title}`,
+              title: `학업 알리미 - ${alert.title}`,
               text: shareText,
               url: window.location.origin + "/alerts.html?view=" + alert._id,
             })
@@ -1746,7 +1744,7 @@
         shareUrl.value = url;
 
         // 공유 텍스트 생성 - 알림 제목, 마감일, 설명 포함
-        const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${new Date(
+        const shareText = `[학업 알리미] ${alert.title}\n마감일: ${new Date(
           alert.date
         ).toLocaleDateString()}\n내용: ${alert.description}`;
 
@@ -1815,7 +1813,7 @@
           if (navigator.share) {
             navigator
               .share({
-                title: `수행평가 알리미 - ${alert.title}`,
+                title: `학업 알리미 - ${alert.title}`,
                 text: shareText,
                 url: url,
               })

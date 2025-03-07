@@ -135,7 +135,7 @@ async function showPersistentDeadlineNotification() {
         },
       };
 
-      await self.registration.showNotification(`수행평가 알리미`, options);
+      await self.registration.showNotification(`학업 알리미`, options);
     }
   } catch (error) {
     console.error("지속적인 알림 표시 오류:", error);
