@@ -6,6 +6,14 @@
     <title>회원가입 - 수행평가 알리미</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="description" content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/android-chrome-192x192" />
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- Pretendard 폰트 -->
     <link
       rel="stylesheet"
@@ -178,6 +186,67 @@
             <p class="mt-1 text-xs text-gray-500">
               이메일로 전송된 6자리 인증 코드를 입력하세요. 인증 코드는 10분간 유효합니다.
             </p>
+          </div>
+
+          <div>
+            <label
+              for="school"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >학교</label
+            >
+            <select
+              id="school"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              required
+            >
+              <option value="">학교를 선택하세요</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="grade"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >학년</label
+            >
+            <select
+              id="grade"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              required
+            >
+              <option value="">학년을 선택하세요</option>
+              <option value="grade1">1학년</option>
+              <option value="grade2">2학년</option>
+              <option value="grade3">3학년</option>
+              <option value="grade4">4학년</option>
+              <option value="grade5">5학년</option>
+              <option value="grade6">6학년</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="class"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >반</label
+            >
+            <select
+              id="class"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+              required
+            >
+              <option value="">반을 선택하세요</option>
+              <option value="class1">1반</option>
+              <option value="class2">2반</option>
+              <option value="class3">3반</option>
+              <option value="class4">4반</option>
+              <option value="class5">5반</option>
+              <option value="class6">6반</option>
+              <option value="class7">7반</option>
+              <option value="class8">8반</option>
+              <option value="class9">9반</option>
+              <option value="class10">10반</option>
+            </select>
           </div>
 
           <div>
@@ -399,6 +468,22 @@
           window.location.href = 'index.html';
           return;
         }
+
+        // 학교 목록 가져오기
+        const schoolSelect = document.getElementById('school');
+        fetch(`${API_BASE_URL}/schools`)
+          .then(response => response.json())
+          .then(schools => {
+            schools.forEach(school => {
+              const option = document.createElement('option');
+              option.value = school.name;
+              option.textContent = school.name;
+              schoolSelect.appendChild(option);
+            });
+          })
+          .catch(error => {
+            console.error('학교 목록을 가져오는 중 오류 발생:', error);
+          });
         
         // 모달 관련 요소
         const termsModal = document.getElementById('terms-modal');
@@ -608,6 +693,9 @@
           // 폼 데이터 수집
           const name = document.getElementById('name').value;
           const email = document.getElementById('email').value;
+          const school = document.getElementById('school').value;
+          const grade = document.getElementById('grade').value;
+          const className = document.getElementById('class').value;
           
           try {
             // API 호출
@@ -620,10 +708,10 @@
                 name, 
                 email, 
                 password: password.value,
-                school: "default_school", // 기본값 설정
-                grade: "default_grade", // 기본값 설정
-                class: "default_class", // 기본값 설정
-                isVerified: isEmailVerified // 이메일 인증 상태 전달
+                school,
+                grade,
+                class: className,
+                isVerified: isEmailVerified
               })
             });
             

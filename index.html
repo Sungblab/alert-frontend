@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
     <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="/icons/android-chrome-192x192" />
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Pretendard 폰트 -->
@@ -87,43 +88,43 @@
         class="container mx-auto px-4 py-4 flex justify-between items-center"
       >
         <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
-        <nav>
-          <ul class="flex space-x-4">
-            <li>
-              <a href="index.html" class="text-primary font-medium">홈</a>
-            </li>
-            <li>
-              <a href="alerts.html" class="text-gray-600 hover:text-primary"
-                >알리미</a
-              >
-            </li>
-            <li>
-              <a href="profile.html" class="text-gray-600 hover:text-primary"
-                >내 정보</a
-              >
-            </li>
-            <li>
-              <a href="login.html" class="text-gray-600 hover:text-primary"
-                >로그인</a
-              >
-            </li>
-            <li>
-              <button 
-                id="install-button" 
-                class="text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-md hidden"
-              >
-                앱 설치하기
-              </button>
-            </li>
-          </ul>
-        </nav>
+        <div class="flex items-center space-x-4">
+          <button 
+            id="install-button" 
+            class="text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-md hidden"
+          >
+            앱 설치하기
+          </button>
+          <nav>
+            <ul class="flex space-x-4">
+              <li>
+                <a href="index.html" class="text-primary font-medium">홈</a>
+              </li>
+              <li>
+                <a href="alerts.html" class="text-gray-600 hover:text-primary">알리미</a>
+              </li>
+              <li>
+                <a href="profile.html" class="text-gray-600 hover:text-primary">내 정보</a>
+              </li>
+              <li>
+                <a href="login.html" class="text-gray-600 hover:text-primary">로그인</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </header>
 
     <!-- 모바일 헤더 - 모바일에서만 표시 -->
     <header class="bg-white shadow-sm md:hidden">
-      <div class="container mx-auto px-4 py-4 flex justify-center items-center">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <h1 class="text-xl font-bold text-primary">수행평가 알리미</h1>
+        <button 
+          id="mobile-install-button" 
+          class="text-white bg-primary hover:bg-primary-dark px-3 py-1 rounded-md text-sm hidden"
+        >
+          <i class="fas fa-download mr-1"></i> 설치
+        </button>
       </div>
     </header>
 
@@ -581,13 +582,6 @@
           <i class="fas fa-sign-in-alt text-xl mb-1"></i>
           <span class="text-xs">로그인</span>
         </a>
-        <button
-          id="mobile-install-button"
-          class="flex flex-col items-center py-2 px-3 text-gray-600 hidden"
-        >
-          <i class="fas fa-download text-xl mb-1"></i>
-          <span class="text-xs">앱 설치</span>
-        </button>
       </div>
     </nav>
 

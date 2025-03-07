@@ -6,6 +6,14 @@
     <title>관리자 페이지 - 수행평가 알리미</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="description" content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- Pretendard 폰트 -->
     <link
       rel="stylesheet"
@@ -38,6 +46,8 @@
         },
       };
     </script>
+    <!-- PWA 스크립트 -->
+    <script src="pwa.js" defer></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- 헤더 -->
@@ -51,6 +61,14 @@
             </li>
             <li>
               <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
+            </li>
+            <li>
+              <button 
+                id="install-button" 
+                class="text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-md hidden"
+              >
+                앱 설치하기
+              </button>
             </li>
           </ul>
         </nav>

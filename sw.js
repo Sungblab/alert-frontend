@@ -9,9 +9,16 @@ const urlsToCache = [
   '/admin.html',
   '/find-password.html',
   '/manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  '/icons/android-chrome-192x192.png',
+  '/icons/android-chrome-512x512.png',
+  '/icons/apple-touch-icon.png',
+  '/icons/favicon-16x16.png',
+  '/icons/favicon-32x32.png',
+  '/icons/favicon.ico'
+  // CDN 리소스는 CORS 문제로 제외
+  // 'https://cdn.tailwindcss.com',
+  // 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css',
+  // 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 // 서비스 워커 설치 및 캐시 파일 저장
@@ -20,13 +27,35 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('캐시 열기 성공');
-        return cache.addAll(urlsToCache);
+        // 각 URL을 개별적으로 캐싱하여 하나의 실패가 전체를 실패시키지 않도록 함
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            cache.add(url).catch(err => {
+              console.error(`${url} 캐싱 실패:`, err);
+            })
+          )
+        );
       })
   );
 });
 
 // 네트워크 요청 가로채기 및 캐시된 응답 반환
 self.addEventListener('fetch', event => {
+  // CORS 문제가 있는 외부 리소스는 네트워크 우선 전략 사용
+  const isCorsResource = event.request.url.includes('cdn.tailwindcss.com') || 
+                         event.request.url.includes('cdn.jsdelivr.net') || 
+                         event.request.url.includes('cdnjs.cloudflare.com');
+
+  if (isCorsResource) {
+    // 외부 CDN 리소스는 네트워크 우선, 실패 시 캐시 사용
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 일반 리소스는 캐시 우선, 없으면 네트워크 사용
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -47,17 +76,35 @@ self.addEventListener('fetch', event => {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then(cache => {
-                cache.put(event.request, responseToCache);
+                cache.put(event.request, responseToCache)
+                  .catch(err => {
+                    console.error('캐시 저장 중 오류 발생:', err);
+                  });
               });
             
             return response;
+          })
+          .catch(error => {
+            console.error('네트워크 요청 실패:', error);
+            // 오프라인이고 HTML 요청인 경우 오프라인 페이지 제공
+            if (event.request.url.includes('.html')) {
+              return caches.match('/index.html');
+            }
+            // 그 외의 경우 오류를 그대로 전파
+            throw error;
           });
       })
-      .catch(() => {
-        // 오프라인이고 캐시에 없는 경우 오프라인 페이지 제공
+      .catch(error => {
+        console.error('캐시 매치 실패:', error);
+        // 오프라인이고 HTML 요청인 경우 오프라인 페이지 제공
         if (event.request.url.includes('.html')) {
-          return caches.match('/index.html');
+          return caches.match('/index.html')
+            .catch(err => {
+              console.error('오프라인 페이지 제공 실패:', err);
+              throw err;
+            });
         }
+        throw error;
       })
   );
 });
