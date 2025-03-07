@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>관리자 페이지 - 수행평가 알리미</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#4f46e5" />
-    <meta name="description" content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스" />
+    <meta
+      name="description"
+      content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes" />
     <!-- Pretendard 폰트 -->
     <link
       rel="stylesheet"
@@ -48,28 +54,32 @@
     </script>
     <!-- PWA 스크립트 -->
     <script src="pwa.js" defer></script>
-</head>
-<body class="bg-gray-50 min-h-screen">
+  </head>
+  <body class="bg-gray-50 min-h-screen">
     <!-- 헤더 -->
     <header class="bg-white shadow-sm">
-      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-primary">수행평가 알리미 - 관리자</h1>
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-primary">
+          수행평가 알리미 - 관리자
+        </h1>
         <nav>
           <ul class="flex space-x-4">
             <li>
-              <a href="index.html" class="text-gray-600 hover:text-primary">홈</a>
-            </li>
-            <li>
-              <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
-            </li>
-            <li>
-              <button 
-                id="install-button" 
-                class="text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-md hidden"
+              <a href="index.html" class="text-gray-600 hover:text-primary"
+                >홈</a
               >
-                앱 설치하기
-              </button>
             </li>
+            <li>
+              <a
+                href="#"
+                id="logout-btn"
+                class="text-gray-600 hover:text-primary"
+                >로그아웃</a
+              >
+            </li>
+            <li></li>
           </ul>
         </nav>
       </div>
@@ -84,13 +94,35 @@
           <nav>
             <ul class="space-y-2">
               <li>
-                <button id="schools-tab-btn" class="w-full text-left px-3 py-2 rounded-md bg-primary text-white">
+                <button
+                  id="schools-tab-btn"
+                  class="w-full text-left px-3 py-2 rounded-md bg-primary text-white"
+                >
                   <i class="fas fa-school mr-2"></i>학교 관리
                 </button>
               </li>
               <li>
-                <button id="users-tab-btn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100">
+                <button
+                  id="users-tab-btn"
+                  class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+                >
                   <i class="fas fa-users mr-2"></i>사용자 관리
+                </button>
+              </li>
+              <li>
+                <button
+                  id="alerts-tab-btn"
+                  class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+                >
+                  <i class="fas fa-bell mr-2"></i>알림 관리
+                </button>
+              </li>
+              <li>
+                <button
+                  id="tips-tab-btn"
+                  class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+                >
+                  <i class="fas fa-lightbulb mr-2"></i>팁 게시판 관리
                 </button>
               </li>
             </ul>
@@ -103,11 +135,14 @@
           <div id="schools-tab" class="bg-white rounded-lg shadow-md p-6">
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold">학교 관리</h2>
-              <button id="add-school-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600">
+              <button
+                id="add-school-btn"
+                class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600"
+              >
                 <i class="fas fa-plus mr-2"></i>학교 추가
               </button>
             </div>
-            
+
             <!-- 학교 목록 -->
             <div class="overflow-x-auto">
               <table class="min-w-full bg-white">
@@ -122,7 +157,9 @@
                 <tbody id="schools-list">
                   <!-- 학교 목록이 여기에 동적으로 추가됩니다 -->
                   <tr>
-                    <td colspan="4" class="py-4 text-center text-gray-500">로딩 중...</td>
+                    <td colspan="4" class="py-4 text-center text-gray-500">
+                      로딩 중...
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -134,7 +171,7 @@
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold">사용자 관리</h2>
             </div>
-            
+
             <!-- 사용자 목록 -->
             <div class="overflow-x-auto">
               <table class="min-w-full bg-white">
@@ -151,10 +188,186 @@
                 <tbody id="users-list">
                   <!-- 사용자 목록이 여기에 동적으로 추가됩니다 -->
                   <tr>
-                    <td colspan="6" class="py-4 text-center text-gray-500">로딩 중...</td>
+                    <td colspan="6" class="py-4 text-center text-gray-500">
+                      로딩 중...
+                    </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- 알림 관리 탭 -->
+          <div id="alerts-tab" class="bg-white rounded-lg shadow-md p-6 hidden">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">알림 관리</h2>
+            </div>
+
+            <!-- 알림 필터 -->
+            <div class="mb-4 flex flex-wrap gap-2">
+              <select
+                id="alert-filter-school"
+                class="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">모든 학교</option>
+                <!-- 학교 목록이 여기에 동적으로 추가됩니다 -->
+              </select>
+              <select
+                id="alert-filter-grade"
+                class="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">모든 학년</option>
+                <option value="1">1학년</option>
+                <option value="2">2학년</option>
+                <option value="3">3학년</option>
+              </select>
+              <select
+                id="alert-filter-class"
+                class="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">모든 반</option>
+                <option value="1">1반</option>
+                <option value="2">2반</option>
+                <option value="3">3반</option>
+                <option value="4">4반</option>
+                <option value="5">5반</option>
+                <option value="6">6반</option>
+                <option value="7">7반</option>
+                <option value="8">8반</option>
+                <option value="9">9반</option>
+                <option value="10">10반</option>
+              </select>
+              <button
+                id="alert-filter-btn"
+                class="bg-primary text-white px-3 py-2 rounded-md"
+              >
+                필터 적용
+              </button>
+            </div>
+
+            <!-- 알림 목록 -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="py-3 px-4 text-left">제목</th>
+                    <th class="py-3 px-4 text-left">날짜</th>
+                    <th class="py-3 px-4 text-left">학교</th>
+                    <th class="py-3 px-4 text-left">학년/반</th>
+                    <th class="py-3 px-4 text-left">작성자</th>
+                    <th class="py-3 px-4 text-left">작성일</th>
+                    <th class="py-3 px-4 text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="alerts-list">
+                  <!-- 알림 목록이 여기에 동적으로 추가됩니다 -->
+                  <tr>
+                    <td colspan="7" class="py-4 text-center text-gray-500">
+                      로딩 중...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 팁 게시판 관리 탭 -->
+          <div id="tips-tab" class="bg-white rounded-lg shadow-md p-6 hidden">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">팁 게시판 관리</h2>
+            </div>
+
+            <!-- 팁 필터 -->
+            <div class="mb-4 flex flex-wrap gap-2">
+              <select
+                id="tip-filter-school"
+                class="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">모든 학교</option>
+                <!-- 학교 목록이 여기에 동적으로 추가됩니다 -->
+              </select>
+              <select
+                id="tip-filter-grade"
+                class="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">모든 학년</option>
+                <option value="1">1학년</option>
+                <option value="2">2학년</option>
+                <option value="3">3학년</option>
+              </select>
+              <select
+                id="tip-filter-class"
+                class="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="">모든 반</option>
+                <option value="1">1반</option>
+                <option value="2">2반</option>
+                <option value="3">3반</option>
+                <option value="4">4반</option>
+                <option value="5">5반</option>
+                <option value="6">6반</option>
+                <option value="7">7반</option>
+                <option value="8">8반</option>
+                <option value="9">9반</option>
+                <option value="10">10반</option>
+              </select>
+              <button
+                id="tip-filter-btn"
+                class="bg-primary text-white px-3 py-2 rounded-md"
+              >
+                필터 적용
+              </button>
+            </div>
+
+            <!-- 팁 목록 -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="py-3 px-4 text-left">내용</th>
+                    <th class="py-3 px-4 text-left">학교</th>
+                    <th class="py-3 px-4 text-left">학년/반</th>
+                    <th class="py-3 px-4 text-left">작성자</th>
+                    <th class="py-3 px-4 text-left">좋아요</th>
+                    <th class="py-3 px-4 text-left">작성일</th>
+                    <th class="py-3 px-4 text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="tips-list">
+                  <!-- 팁 목록이 여기에 동적으로 추가됩니다 -->
+                  <tr>
+                    <td colspan="7" class="py-4 text-center text-gray-500">
+                      로딩 중...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 댓글 관리 섹션 -->
+            <div class="mt-8">
+              <h3 class="text-lg font-semibold mb-4">댓글 관리</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="py-3 px-4 text-left">내용</th>
+                      <th class="py-3 px-4 text-left">작성자</th>
+                      <th class="py-3 px-4 text-left">작성일</th>
+                      <th class="py-3 px-4 text-left">관련 팁</th>
+                      <th class="py-3 px-4 text-center">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tip-comments-list">
+                    <!-- 댓글 목록이 여기에 동적으로 추가됩니다 -->
+                    <tr>
+                      <td colspan="5" class="py-4 text-center text-gray-500">
+                        로딩 중...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -162,34 +375,74 @@
     </main>
 
     <!-- 학교 추가/수정 모달 -->
-    <div id="school-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div
+      id="school-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
       <div class="bg-white rounded-lg max-w-md w-full p-6">
         <div class="flex justify-between items-center mb-4">
-          <h3 id="school-modal-title" class="text-xl font-semibold">학교 추가</h3>
-          <button id="close-school-modal" class="text-gray-500 hover:text-gray-700">
+          <h3 id="school-modal-title" class="text-xl font-semibold">
+            학교 추가
+          </h3>
+          <button
+            id="close-school-modal"
+            class="text-gray-500 hover:text-gray-700"
+          >
             <i class="fas fa-times"></i>
           </button>
         </div>
         <form id="school-form">
-          <input type="hidden" id="school-id">
+          <input type="hidden" id="school-id" />
           <div class="mb-4">
-            <label for="school-name" class="block text-sm font-medium text-gray-700 mb-1">학교 이름</label>
-            <input type="text" id="school-name" class="w-full p-2 border border-gray-300 rounded-md" required>
+            <label
+              for="school-name"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >학교 이름</label
+            >
+            <input
+              type="text"
+              id="school-name"
+              class="w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
           </div>
           <div class="mb-4">
-            <label for="school-address" class="block text-sm font-medium text-gray-700 mb-1">주소</label>
-            <input type="text" id="school-address" class="w-full p-2 border border-gray-300 rounded-md">
+            <label
+              for="school-address"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >주소</label
+            >
+            <input
+              type="text"
+              id="school-address"
+              class="w-full p-2 border border-gray-300 rounded-md"
+            />
           </div>
           <div class="mb-4">
-            <label for="school-description" class="block text-sm font-medium text-gray-700 mb-1">설명</label>
-            <textarea id="school-description" class="w-full p-2 border border-gray-300 rounded-md" rows="3"></textarea>
+            <label
+              for="school-description"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >설명</label
+            >
+            <textarea
+              id="school-description"
+              class="w-full p-2 border border-gray-300 rounded-md"
+              rows="3"
+            ></textarea>
           </div>
           <div id="school-error" class="text-danger text-sm mb-4 hidden"></div>
           <div class="flex justify-end">
-            <button type="button" id="cancel-school-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2">
+            <button
+              type="button"
+              id="cancel-school-btn"
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2"
+            >
               취소
             </button>
-            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md">
+            <button
+              type="submit"
+              class="bg-primary text-white px-4 py-2 rounded-md"
+            >
               저장
             </button>
           </div>
@@ -198,44 +451,89 @@
     </div>
 
     <!-- 사용자 수정 모달 -->
-    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div
+      id="user-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
       <div class="bg-white rounded-lg max-w-md w-full p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-semibold">사용자 정보 수정</h3>
-          <button id="close-user-modal" class="text-gray-500 hover:text-gray-700">
+          <button
+            id="close-user-modal"
+            class="text-gray-500 hover:text-gray-700"
+          >
             <i class="fas fa-times"></i>
           </button>
         </div>
         <form id="user-form">
-          <input type="hidden" id="user-id">
+          <input type="hidden" id="user-id" />
           <div class="mb-4">
-            <label for="user-name" class="block text-sm font-medium text-gray-700 mb-1">이름</label>
-            <input type="text" id="user-name" class="w-full p-2 border border-gray-300 rounded-md" required>
+            <label
+              for="user-name"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >이름</label
+            >
+            <input
+              type="text"
+              id="user-name"
+              class="w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
           </div>
           <div class="mb-4">
-            <label for="user-email" class="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-            <input type="email" id="user-email" class="w-full p-2 border border-gray-300 rounded-md" required>
+            <label
+              for="user-email"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >이메일</label
+            >
+            <input
+              type="email"
+              id="user-email"
+              class="w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
           </div>
           <div class="mb-4">
-            <label for="user-school" class="block text-sm font-medium text-gray-700 mb-1">학교</label>
-            <select id="user-school" class="w-full p-2 border border-gray-300 rounded-md">
+            <label
+              for="user-school"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >학교</label
+            >
+            <select
+              id="user-school"
+              class="w-full p-2 border border-gray-300 rounded-md"
+            >
               <option value="default_school">선택 안함</option>
               <!-- 학교 목록이 여기에 동적으로 추가됩니다 -->
             </select>
           </div>
           <div class="mb-4">
-            <label for="user-role" class="block text-sm font-medium text-gray-700 mb-1">역할</label>
-            <select id="user-role" class="w-full p-2 border border-gray-300 rounded-md">
+            <label
+              for="user-role"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >역할</label
+            >
+            <select
+              id="user-role"
+              class="w-full p-2 border border-gray-300 rounded-md"
+            >
               <option value="user">일반 사용자</option>
               <option value="admin">관리자</option>
             </select>
           </div>
           <div id="user-error" class="text-danger text-sm mb-4 hidden"></div>
           <div class="flex justify-end">
-            <button type="button" id="cancel-user-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2">
+            <button
+              type="button"
+              id="cancel-user-btn"
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2"
+            >
               취소
             </button>
-            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md">
+            <button
+              type="submit"
+              class="bg-primary text-white px-4 py-2 rounded-md"
+            >
               저장
             </button>
           </div>
@@ -243,16 +541,51 @@
       </div>
     </div>
 
+    <!-- 팁 댓글 보기 모달 -->
+    <div
+      id="tip-comments-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+    >
+      <div class="bg-white rounded-lg max-w-3xl w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold">팁 댓글 보기</h3>
+          <button
+            id="close-tip-comments-modal"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="mb-4 p-4 bg-gray-50 rounded-md">
+          <h4 class="font-medium mb-2">팁 내용</h4>
+          <p id="tip-comments-modal-content" class="text-gray-700"></p>
+          <div
+            class="flex justify-between items-center mt-2 text-sm text-gray-500"
+          >
+            <span id="tip-comments-modal-author"></span>
+            <span id="tip-comments-modal-date"></span>
+          </div>
+        </div>
+        <div class="max-h-96 overflow-y-auto">
+          <h4 class="font-medium mb-2">댓글 목록</h4>
+          <div id="tip-comments-modal-list" class="space-y-3">
+            <!-- 댓글 목록이 여기에 동적으로 추가됩니다 -->
+            <p class="text-center text-gray-500 py-4">로딩 중...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 푸터 -->
-    <footer class=" text-white hidden md:block">
+    <footer class="py-4 text-black hidden md:block">
       <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="mb-4 md:mb-0">
-            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
-            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+            <h2 class="text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-sm mt-1">학교 생활을 더 편리하게</p>
           </div>
           <div>
-            <p class="text-sm text-black">
+            <p class="text-sm">
               &copy; 2025 수행평가 알리미. All rights reserved.
             </p>
           </div>
@@ -264,109 +597,185 @@
     <script>
       // API 기본 URL
       const API_BASE_URL = "http://localhost:5000/api";
-      
+
       // DOM이 로드된 후 실행
-      document.addEventListener("DOMContentLoaded", function() {
+      document.addEventListener("DOMContentLoaded", function () {
         // 관리자 인증 확인
         checkAdminAuth();
-        
+
         // 탭 전환 이벤트 리스너
-        document.getElementById('schools-tab-btn').addEventListener('click', function() {
-          showTab('schools');
-        });
-        
-        document.getElementById('users-tab-btn').addEventListener('click', function() {
-          showTab('users');
-        });
-        
+        document
+          .getElementById("schools-tab-btn")
+          .addEventListener("click", function () {
+            showTab("schools");
+          });
+
+        document
+          .getElementById("users-tab-btn")
+          .addEventListener("click", function () {
+            showTab("users");
+          });
+
+        document
+          .getElementById("alerts-tab-btn")
+          .addEventListener("click", function () {
+            showTab("alerts");
+          });
+
+        document
+          .getElementById("tips-tab-btn")
+          .addEventListener("click", function () {
+            showTab("tips");
+          });
+
         // 로그아웃 버튼 이벤트 리스너
-        document.getElementById('logout-btn').addEventListener('click', function() {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = 'login.html';
-        });
+        document
+          .getElementById("logout-btn")
+          .addEventListener("click", function () {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+          });
+
+        // 알림 필터 버튼 이벤트 리스너
+        document
+          .getElementById("alert-filter-btn")
+          .addEventListener("click", function () {
+            loadAlerts();
+          });
+
+        // 팁 필터 버튼 이벤트 리스너
+        document
+          .getElementById("tip-filter-btn")
+          .addEventListener("click", function () {
+            loadTips();
+          });
       });
-      
+
       // 관리자 인증 확인
       async function checkAdminAuth() {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
+        console.log("저장된 토큰:", token); // 디버깅 로그 추가
+
         if (!token) {
-          // 토큰이 없으면 로그인 페이지로 리다이렉트
-          window.location.href = 'login.html';
+          console.error("토큰이 없습니다. 로그인 페이지로 이동합니다.");
+          window.location.href = "login.html";
           return;
         }
-        
+
         try {
           // 사용자 정보 가져오기
           const response = await fetch(`${API_BASE_URL}/users/me`, {
+            method: "GET",
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('인증에 실패했습니다.');
+            if (response.status === 401) {
+              console.error(
+                "인증이 만료되었습니다. 로그인 페이지로 이동합니다."
+              );
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              window.location.href = "login.html";
+              return;
+            }
+            throw new Error("인증에 실패했습니다.");
           }
-          
+
           const user = await response.json();
-          
+          console.log("사용자 정보:", user);
+
           // 관리자가 아니면 홈페이지로 리다이렉트
-          if (user.role !== 'admin') {
-            alert('관리자 권한이 필요합니다.');
-            window.location.href = 'index.html';
+          if (!user.isAdmin) {
+            console.error("관리자 권한이 없습니다. 홈페이지로 이동합니다.");
+            alert("관리자 권한이 필요합니다.");
+            window.location.href = "index.html";
             return;
           }
-          
+
           // 관리자 인증 성공 시 데이터 로드
           loadSchools();
           loadUsers();
-          
+          loadAlerts();
+          loadTips();
+          loadTipComments();
         } catch (error) {
-          console.error('인증 오류:', error);
-          alert('인증에 실패했습니다. 다시 로그인해주세요.');
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = 'login.html';
+          console.error("인증 오류:", error);
+          alert("인증에 실패했습니다. 다시 로그인해주세요.");
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          window.location.href = "login.html";
         }
       }
-      
+
       // 탭 전환 함수
       function showTab(tabName) {
         // 모든 탭 버튼 비활성화
-        document.getElementById('schools-tab-btn').classList.remove('bg-primary', 'text-white');
-        document.getElementById('users-tab-btn').classList.remove('bg-primary', 'text-white');
-        document.getElementById('schools-tab-btn').classList.add('hover:bg-gray-100');
-        document.getElementById('users-tab-btn').classList.add('hover:bg-gray-100');
-        
+        document
+          .getElementById("schools-tab-btn")
+          .classList.remove("bg-primary", "text-white");
+        document
+          .getElementById("users-tab-btn")
+          .classList.remove("bg-primary", "text-white");
+        document
+          .getElementById("alerts-tab-btn")
+          .classList.remove("bg-primary", "text-white");
+        document
+          .getElementById("tips-tab-btn")
+          .classList.remove("bg-primary", "text-white");
+        document
+          .getElementById("schools-tab-btn")
+          .classList.add("hover:bg-gray-100");
+        document
+          .getElementById("users-tab-btn")
+          .classList.add("hover:bg-gray-100");
+        document
+          .getElementById("alerts-tab-btn")
+          .classList.add("hover:bg-gray-100");
+        document
+          .getElementById("tips-tab-btn")
+          .classList.add("hover:bg-gray-100");
+
         // 모든 탭 내용 숨기기
-        document.getElementById('schools-tab').classList.add('hidden');
-        document.getElementById('users-tab').classList.add('hidden');
-        
+        document.getElementById("schools-tab").classList.add("hidden");
+        document.getElementById("users-tab").classList.add("hidden");
+        document.getElementById("alerts-tab").classList.add("hidden");
+        document.getElementById("tips-tab").classList.add("hidden");
+
         // 선택한 탭 활성화
-        document.getElementById(`${tabName}-tab-btn`).classList.add('bg-primary', 'text-white');
-        document.getElementById(`${tabName}-tab-btn`).classList.remove('hover:bg-gray-100');
-        document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+        document
+          .getElementById(`${tabName}-tab-btn`)
+          .classList.add("bg-primary", "text-white");
+        document
+          .getElementById(`${tabName}-tab-btn`)
+          .classList.remove("hover:bg-gray-100");
+        document.getElementById(`${tabName}-tab`).classList.remove("hidden");
       }
-      
+
       // 학교 목록 로드
       async function loadSchools() {
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/schools`, {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('학교 목록을 불러오는데 실패했습니다.');
+            throw new Error("학교 목록을 불러오는데 실패했습니다.");
           }
-          
+
           const schools = await response.json();
-          
+
           // 학교 목록 테이블 업데이트
-          const schoolsList = document.getElementById('schools-list');
-          
+          const schoolsList = document.getElementById("schools-list");
+
           if (schools.length === 0) {
             schoolsList.innerHTML = `
               <tr>
@@ -375,55 +784,69 @@
             `;
             return;
           }
-          
-          schoolsList.innerHTML = schools.map(school => `
+
+          schoolsList.innerHTML = schools
+            .map(
+              (school) => `
             <tr>
               <td class="py-3 px-4">${school.name}</td>
-              <td class="py-3 px-4">${school.address || '-'}</td>
-              <td class="py-3 px-4">${new Date(school.createdAt).toLocaleDateString()}</td>
+              <td class="py-3 px-4">${school.address || "-"}</td>
+              <td class="py-3 px-4">${new Date(
+                school.createdAt
+              ).toLocaleDateString()}</td>
               <td class="py-3 px-4 text-center">
-                <button class="text-primary hover:text-indigo-700 mr-2" onclick="editSchool('${school._id}')">
+                <button class="text-primary hover:text-indigo-700 mr-2" onclick="editSchool('${
+                  school._id
+                }')">
                   <i class="fas fa-edit"></i>
                 </button>
-                <button class="text-danger hover:text-red-700" onclick="deleteSchool('${school._id}')">
+                <button class="text-danger hover:text-red-700" onclick="deleteSchool('${
+                  school._id
+                }')">
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
-          `).join('');
-          
+          `
+            )
+            .join("");
+
           // 사용자 수정 모달의 학교 선택 옵션 업데이트
-          const userSchoolSelect = document.getElementById('user-school');
+          const userSchoolSelect = document.getElementById("user-school");
           userSchoolSelect.innerHTML = `
             <option value="default_school">선택 안함</option>
-            ${schools.map(school => `<option value="${school.name}">${school.name}</option>`).join('')}
+            ${schools
+              .map(
+                (school) =>
+                  `<option value="${school.name}">${school.name}</option>`
+              )
+              .join("")}
           `;
-          
         } catch (error) {
-          console.error('학교 목록 로드 오류:', error);
-          alert('학교 목록을 불러오는데 실패했습니다.');
+          console.error("학교 목록 로드 오류:", error);
+          alert("학교 목록을 불러오는데 실패했습니다.");
         }
       }
-      
+
       // 사용자 목록 로드
       async function loadUsers() {
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/users`, {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('사용자 목록을 불러오는데 실패했습니다.');
+            throw new Error("사용자 목록을 불러오는데 실패했습니다.");
           }
-          
+
           const users = await response.json();
-          
+
           // 사용자 목록 테이블 업데이트
-          const usersList = document.getElementById('users-list');
-          
+          const usersList = document.getElementById("users-list");
+
           if (users.length === 0) {
             usersList.innerHTML = `
               <tr>
@@ -432,283 +855,763 @@
             `;
             return;
           }
-          
-          usersList.innerHTML = users.map(user => `
+
+          usersList.innerHTML = users
+            .map(
+              (user) => `
             <tr>
               <td class="py-3 px-4">${user.name}</td>
               <td class="py-3 px-4">${user.email}</td>
-              <td class="py-3 px-4">${user.school || '-'}</td>
-              <td class="py-3 px-4">${user.role === 'admin' ? '관리자' : '일반 사용자'}</td>
-              <td class="py-3 px-4">${new Date(user.createdAt).toLocaleDateString()}</td>
+              <td class="py-3 px-4">${user.school || "-"}</td>
+              <td class="py-3 px-4">${
+                user.role === "admin" ? "관리자" : "일반 사용자"
+              }</td>
+              <td class="py-3 px-4">${new Date(
+                user.createdAt
+              ).toLocaleDateString()}</td>
               <td class="py-3 px-4 text-center">
-                <button class="text-primary hover:text-indigo-700 mr-2" onclick="editUser('${user._id}')">
+                <button class="text-primary hover:text-indigo-700 mr-2" onclick="editUser('${
+                  user._id
+                }')">
                   <i class="fas fa-edit"></i>
                 </button>
-                <button class="text-danger hover:text-red-700" onclick="deleteUser('${user._id}')">
+                <button class="text-danger hover:text-red-700" onclick="deleteUser('${
+                  user._id
+                }')">
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
-          `).join('');
-          
+          `
+            )
+            .join("");
         } catch (error) {
-          console.error('사용자 목록 로드 오류:', error);
-          alert('사용자 목록을 불러오는데 실패했습니다.');
+          console.error("사용자 목록 로드 오류:", error);
+          alert("사용자 목록을 불러오는데 실패했습니다.");
         }
       }
-      
+
       // 학교 추가 모달 열기
-      document.getElementById('add-school-btn').addEventListener('click', function() {
-        document.getElementById('school-modal-title').textContent = '학교 추가';
-        document.getElementById('school-form').reset();
-        document.getElementById('school-id').value = '';
-        document.getElementById('school-error').classList.add('hidden');
-        document.getElementById('school-modal').classList.remove('hidden');
-      });
-      
+      document
+        .getElementById("add-school-btn")
+        .addEventListener("click", function () {
+          document.getElementById("school-modal-title").textContent =
+            "학교 추가";
+          document.getElementById("school-form").reset();
+          document.getElementById("school-id").value = "";
+          document.getElementById("school-error").classList.add("hidden");
+          document.getElementById("school-modal").classList.remove("hidden");
+        });
+
       // 학교 모달 닫기
-      document.getElementById('close-school-modal').addEventListener('click', function() {
-        document.getElementById('school-modal').classList.add('hidden');
-      });
-      
-      document.getElementById('cancel-school-btn').addEventListener('click', function() {
-        document.getElementById('school-modal').classList.add('hidden');
-      });
-      
+      document
+        .getElementById("close-school-modal")
+        .addEventListener("click", function () {
+          document.getElementById("school-modal").classList.add("hidden");
+        });
+
+      document
+        .getElementById("cancel-school-btn")
+        .addEventListener("click", function () {
+          document.getElementById("school-modal").classList.add("hidden");
+        });
+
       // 사용자 모달 닫기
-      document.getElementById('close-user-modal').addEventListener('click', function() {
-        document.getElementById('user-modal').classList.add('hidden');
-      });
-      
-      document.getElementById('cancel-user-btn').addEventListener('click', function() {
-        document.getElementById('user-modal').classList.add('hidden');
-      });
-      
+      document
+        .getElementById("close-user-modal")
+        .addEventListener("click", function () {
+          document.getElementById("user-modal").classList.add("hidden");
+        });
+
+      document
+        .getElementById("cancel-user-btn")
+        .addEventListener("click", function () {
+          document.getElementById("user-modal").classList.add("hidden");
+        });
+
       // 학교 수정 함수
       async function editSchool(schoolId) {
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/schools/${schoolId}`, {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('학교 정보를 불러오는데 실패했습니다.');
+            throw new Error("학교 정보를 불러오는데 실패했습니다.");
           }
-          
+
           const school = await response.json();
-          
+
           // 모달 필드 설정
-          document.getElementById('school-modal-title').textContent = '학교 수정';
-          document.getElementById('school-id').value = school._id;
-          document.getElementById('school-name').value = school.name;
-          document.getElementById('school-address').value = school.address || '';
-          document.getElementById('school-description').value = school.description || '';
-          
+          document.getElementById("school-modal-title").textContent =
+            "학교 수정";
+          document.getElementById("school-id").value = school._id;
+          document.getElementById("school-name").value = school.name;
+          document.getElementById("school-address").value =
+            school.address || "";
+          document.getElementById("school-description").value =
+            school.description || "";
+
           // 모달 표시
-          document.getElementById('school-error').classList.add('hidden');
-          document.getElementById('school-modal').classList.remove('hidden');
-          
+          document.getElementById("school-error").classList.add("hidden");
+          document.getElementById("school-modal").classList.remove("hidden");
         } catch (error) {
-          console.error('학교 수정 오류:', error);
-          alert('학교 정보를 불러오는데 실패했습니다.');
+          console.error("학교 수정 오류:", error);
+          alert("학교 정보를 불러오는데 실패했습니다.");
         }
       }
-      
+
       // 학교 삭제 함수
       async function deleteSchool(schoolId) {
-        if (!confirm('정말로 이 학교를 삭제하시겠습니까?')) {
+        if (!confirm("정말로 이 학교를 삭제하시겠습니까?")) {
           return;
         }
-        
+
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/schools/${schoolId}`, {
-            method: 'DELETE',
+            method: "DELETE",
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('학교 삭제에 실패했습니다.');
+            throw new Error("학교 삭제에 실패했습니다.");
           }
-          
+
           // 학교 목록 새로고침
           loadSchools();
-          
         } catch (error) {
-          console.error('학교 삭제 오류:', error);
-          alert('학교 삭제에 실패했습니다.');
+          console.error("학교 삭제 오류:", error);
+          alert("학교 삭제에 실패했습니다.");
         }
       }
-      
+
       // 사용자 수정 함수
       async function editUser(userId) {
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('사용자 정보를 불러오는데 실패했습니다.');
+            throw new Error("사용자 정보를 불러오는데 실패했습니다.");
           }
-          
+
           const user = await response.json();
-          
+
           // 모달 필드 설정
-          document.getElementById('user-id').value = user._id;
-          document.getElementById('user-name').value = user.name;
-          document.getElementById('user-email').value = user.email;
-          document.getElementById('user-school').value = user.school || 'default_school';
-          document.getElementById('user-role').value = user.role;
-          
+          document.getElementById("user-id").value = user._id;
+          document.getElementById("user-name").value = user.name;
+          document.getElementById("user-email").value = user.email;
+          document.getElementById("user-school").value =
+            user.school || "default_school";
+          document.getElementById("user-role").value = user.role;
+
           // 모달 표시
-          document.getElementById('user-error').classList.add('hidden');
-          document.getElementById('user-modal').classList.remove('hidden');
-          
+          document.getElementById("user-error").classList.add("hidden");
+          document.getElementById("user-modal").classList.remove("hidden");
         } catch (error) {
-          console.error('사용자 수정 오류:', error);
-          alert('사용자 정보를 불러오는데 실패했습니다.');
+          console.error("사용자 수정 오류:", error);
+          alert("사용자 정보를 불러오는데 실패했습니다.");
         }
       }
-      
+
       // 사용자 삭제 함수
       async function deleteUser(userId) {
-        if (!confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
+        if (!confirm("정말로 이 사용자를 삭제하시겠습니까?")) {
           return;
         }
-        
+
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-            method: 'DELETE',
+            method: "DELETE",
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           });
-          
+
           if (!response.ok) {
-            throw new Error('사용자 삭제에 실패했습니다.');
+            throw new Error("사용자 삭제에 실패했습니다.");
           }
-          
+
           // 사용자 목록 새로고침
           loadUsers();
-          
         } catch (error) {
-          console.error('사용자 삭제 오류:', error);
-          alert('사용자 삭제에 실패했습니다.');
+          console.error("사용자 삭제 오류:", error);
+          alert("사용자 삭제에 실패했습니다.");
         }
       }
-      
+
       // 학교 폼 제출 이벤트 리스너
-      document.getElementById('school-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const schoolId = document.getElementById('school-id').value;
-        const name = document.getElementById('school-name').value;
-        const address = document.getElementById('school-address').value;
-        const description = document.getElementById('school-description').value;
-        
-        if (!name) {
-          document.getElementById('school-error').textContent = '학교 이름은 필수 항목입니다.';
-          document.getElementById('school-error').classList.remove('hidden');
-          return;
-        }
-        
-        try {
-          const token = localStorage.getItem('token');
-          const url = schoolId 
-            ? `${API_BASE_URL}/schools/${schoolId}` 
-            : `${API_BASE_URL}/schools`;
-          const method = schoolId ? 'PUT' : 'POST';
-          
-          const response = await fetch(url, {
-            method,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              name,
-              address,
-              description
-            })
-          });
-          
-          if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || '학교 저장에 실패했습니다.');
+      document
+        .getElementById("school-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const schoolId = document.getElementById("school-id").value;
+          const name = document.getElementById("school-name").value;
+          const address = document.getElementById("school-address").value;
+          const description =
+            document.getElementById("school-description").value;
+
+          if (!name) {
+            document.getElementById("school-error").textContent =
+              "학교 이름은 필수 항목입니다.";
+            document.getElementById("school-error").classList.remove("hidden");
+            return;
           }
-          
-          // 모달 닫기
-          document.getElementById('school-modal').classList.add('hidden');
-          
-          // 학교 목록 새로고침
-          loadSchools();
-          
-        } catch (error) {
-          console.error('학교 저장 오류:', error);
-          document.getElementById('school-error').textContent = error.message;
-          document.getElementById('school-error').classList.remove('hidden');
-        }
-      });
-      
+
+          try {
+            const token = localStorage.getItem("token");
+            const url = schoolId
+              ? `${API_BASE_URL}/schools/${schoolId}`
+              : `${API_BASE_URL}/schools`;
+            const method = schoolId ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+              method,
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name,
+                address,
+                description,
+              }),
+            });
+
+            if (!response.ok) {
+              const data = await response.json();
+              throw new Error(data.message || "학교 저장에 실패했습니다.");
+            }
+
+            // 모달 닫기
+            document.getElementById("school-modal").classList.add("hidden");
+
+            // 학교 목록 새로고침
+            loadSchools();
+          } catch (error) {
+            console.error("학교 저장 오류:", error);
+            document.getElementById("school-error").textContent = error.message;
+            document.getElementById("school-error").classList.remove("hidden");
+          }
+        });
+
       // 사용자 폼 제출 이벤트 리스너
-      document.getElementById('user-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const userId = document.getElementById('user-id').value;
-        const name = document.getElementById('user-name').value;
-        const email = document.getElementById('user-email').value;
-        const school = document.getElementById('user-school').value;
-        const role = document.getElementById('user-role').value;
-        
-        if (!name || !email) {
-          document.getElementById('user-error').textContent = '이름과 이메일은 필수 항목입니다.';
-          document.getElementById('user-error').classList.remove('hidden');
+      document
+        .getElementById("user-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const userId = document.getElementById("user-id").value;
+          const name = document.getElementById("user-name").value;
+          const email = document.getElementById("user-email").value;
+          const school = document.getElementById("user-school").value;
+          const role = document.getElementById("user-role").value;
+
+          if (!name || !email) {
+            document.getElementById("user-error").textContent =
+              "이름과 이메일은 필수 항목입니다.";
+            document.getElementById("user-error").classList.remove("hidden");
+            return;
+          }
+
+          try {
+            const token = localStorage.getItem("token");
+            console.log("API 요청에 사용할 토큰:", token);
+
+            const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name,
+                email,
+                school,
+                role,
+              }),
+            });
+
+            if (!response.ok) {
+              const data = await response.json();
+              throw new Error(
+                data.message || "사용자 정보 저장에 실패했습니다."
+              );
+            }
+
+            // 모달 닫기
+            document.getElementById("user-modal").classList.add("hidden");
+
+            // 사용자 목록 새로고침
+            loadUsers();
+          } catch (error) {
+            console.error("사용자 정보 저장 오류:", error);
+            document.getElementById("user-error").textContent = error.message;
+            document.getElementById("user-error").classList.remove("hidden");
+          }
+        });
+
+      // 알림 목록 로드
+      async function loadAlerts() {
+        try {
+          const token = localStorage.getItem("token");
+
+          // 필터 값 가져오기
+          const school = document.getElementById("alert-filter-school").value;
+          const grade = document.getElementById("alert-filter-grade").value;
+          const className = document.getElementById("alert-filter-class").value;
+
+          // 쿼리 파라미터 구성
+          let url = `${API_BASE_URL}/alerts`;
+          const params = new URLSearchParams();
+          if (school) params.append("school", school);
+          if (grade) params.append("grade", grade);
+          if (className) params.append("class", className);
+
+          if (params.toString()) {
+            url += `?${params.toString()}`;
+          }
+
+          const response = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("알림 목록을 불러오는데 실패했습니다.");
+          }
+
+          const alerts = await response.json();
+
+          // 알림 목록 테이블 업데이트
+          const alertsList = document.getElementById("alerts-list");
+
+          if (alerts.length === 0) {
+            alertsList.innerHTML = `
+              <tr>
+                <td colspan="7" class="py-4 text-center text-gray-500">등록된 알림이 없습니다.</td>
+              </tr>
+            `;
+            return;
+          }
+
+          alertsList.innerHTML = alerts
+            .map(
+              (alert) => `
+            <tr>
+              <td class="py-3 px-4">${alert.title}</td>
+              <td class="py-3 px-4">${alert.date}</td>
+              <td class="py-3 px-4">${alert.school}</td>
+              <td class="py-3 px-4">${alert.grade}학년 ${alert.class}반</td>
+              <td class="py-3 px-4">${alert.authorName || "익명"}</td>
+              <td class="py-3 px-4">${alert.createdAt}</td>
+              <td class="py-3 px-4 text-center">
+                <button class="text-danger hover:text-red-700" onclick="deleteAlert('${
+                  alert._id
+                }')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `
+            )
+            .join("");
+
+          // 알림 필터의 학교 선택 옵션 업데이트
+          updateSchoolFilterOptions("alert-filter-school");
+        } catch (error) {
+          console.error("알림 목록 로드 오류:", error);
+          alert("알림 목록을 불러오는데 실패했습니다.");
+        }
+      }
+
+      // 팁 목록 로드
+      async function loadTips() {
+        try {
+          const token = localStorage.getItem("token");
+
+          // 필터 값 가져오기
+          const school = document.getElementById("tip-filter-school").value;
+          const grade = document.getElementById("tip-filter-grade").value;
+          const className = document.getElementById("tip-filter-class").value;
+
+          // 쿼리 파라미터 구성
+          let url = `${API_BASE_URL}/tips`;
+          const params = new URLSearchParams();
+          if (school) params.append("school", school);
+          if (grade) params.append("grade", grade);
+          if (className) params.append("class", className);
+
+          if (params.toString()) {
+            url += `?${params.toString()}`;
+          }
+
+          const response = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("팁 목록을 불러오는데 실패했습니다.");
+          }
+
+          const tips = await response.json();
+
+          // 팁 목록 테이블 업데이트
+          const tipsList = document.getElementById("tips-list");
+
+          if (tips.length === 0) {
+            tipsList.innerHTML = `
+              <tr>
+                <td colspan="7" class="py-4 text-center text-gray-500">등록된 팁이 없습니다.</td>
+              </tr>
+            `;
+            return;
+          }
+
+          tipsList.innerHTML = tips
+            .map(
+              (tip) => `
+            <tr>
+              <td class="py-3 px-4">${
+                tip.content.length > 50
+                  ? tip.content.substring(0, 50) + "..."
+                  : tip.content
+              }</td>
+              <td class="py-3 px-4">${tip.school}</td>
+              <td class="py-3 px-4">${tip.grade}학년 ${tip.class}반</td>
+              <td class="py-3 px-4">${tip.authorName || "익명"}</td>
+              <td class="py-3 px-4">${tip.likes}</td>
+              <td class="py-3 px-4">${tip.createdAt}</td>
+              <td class="py-3 px-4 text-center">
+                <button class="text-primary hover:text-indigo-700 mr-2" onclick="viewTipComments('${
+                  tip._id
+                }')">
+                  <i class="fas fa-comments"></i>
+                </button>
+                <button class="text-danger hover:text-red-700" onclick="deleteTipAdmin('${
+                  tip._id
+                }')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `
+            )
+            .join("");
+
+          // 팁 필터의 학교 선택 옵션 업데이트
+          updateSchoolFilterOptions("tip-filter-school");
+        } catch (error) {
+          console.error("팁 목록 로드 오류:", error);
+          alert("팁 목록을 불러오는데 실패했습니다.");
+        }
+      }
+
+      // 팁 댓글 목록 로드
+      async function loadTipComments() {
+        try {
+          const token = localStorage.getItem("token");
+
+          // 모든 팁 가져오기
+          const tipsResponse = await fetch(`${API_BASE_URL}/tips`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!tipsResponse.ok) {
+            throw new Error("팁 목록을 불러오는데 실패했습니다.");
+          }
+
+          const tips = await tipsResponse.json();
+
+          // 모든 댓글 추출
+          let allComments = [];
+          tips.forEach((tip) => {
+            if (tip.comments && tip.comments.length > 0) {
+              tip.comments.forEach((comment) => {
+                comment.tipContent = tip.content;
+                allComments.push(comment);
+              });
+            }
+          });
+
+          // 댓글 목록 테이블 업데이트
+          const commentsList = document.getElementById("tip-comments-list");
+
+          if (allComments.length === 0) {
+            commentsList.innerHTML = `
+              <tr>
+                <td colspan="5" class="py-4 text-center text-gray-500">등록된 댓글이 없습니다.</td>
+              </tr>
+            `;
+            return;
+          }
+
+          commentsList.innerHTML = allComments
+            .map(
+              (comment) => `
+            <tr>
+              <td class="py-3 px-4">${
+                comment.content.length > 50
+                  ? comment.content.substring(0, 50) + "..."
+                  : comment.content
+              }</td>
+              <td class="py-3 px-4">${comment.authorName || "익명"}</td>
+              <td class="py-3 px-4">${comment.createdAt}</td>
+              <td class="py-3 px-4">${
+                comment.tipContent.length > 30
+                  ? comment.tipContent.substring(0, 30) + "..."
+                  : comment.tipContent
+              }</td>
+              <td class="py-3 px-4 text-center">
+                <button class="text-danger hover:text-red-700" onclick="deleteTipCommentAdmin('${
+                  comment._id
+                }')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `
+            )
+            .join("");
+        } catch (error) {
+          console.error("댓글 목록 로드 오류:", error);
+          alert("댓글 목록을 불러오는데 실패했습니다.");
+        }
+      }
+
+      // 학교 필터 옵션 업데이트
+      async function updateSchoolFilterOptions(selectId) {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_BASE_URL}/schools`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("학교 목록을 불러오는데 실패했습니다.");
+          }
+
+          const schools = await response.json();
+
+          // 학교 선택 옵션 업데이트
+          const schoolSelect = document.getElementById(selectId);
+          const currentValue = schoolSelect.value;
+
+          schoolSelect.innerHTML = `
+            <option value="">모든 학교</option>
+            ${schools
+              .map(
+                (school) =>
+                  `<option value="${school.name}" ${
+                    currentValue === school.name ? "selected" : ""
+                  }>${school.name}</option>`
+              )
+              .join("")}
+          `;
+        } catch (error) {
+          console.error("학교 목록 로드 오류:", error);
+        }
+      }
+
+      // 알림 삭제 함수
+      async function deleteAlert(alertId) {
+        if (!confirm("정말로 이 알림을 삭제하시겠습니까?")) {
           return;
         }
-        
+
         try {
-          const token = localStorage.getItem('token');
-          
-          const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-            method: 'PUT',
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_BASE_URL}/alerts/${alertId}`, {
+            method: "DELETE",
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({
-              name,
-              email,
-              school,
-              role
-            })
           });
-          
+
           if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.message || '사용자 정보 저장에 실패했습니다.');
+            throw new Error("알림 삭제에 실패했습니다.");
           }
-          
-          // 모달 닫기
-          document.getElementById('user-modal').classList.add('hidden');
-          
-          // 사용자 목록 새로고침
-          loadUsers();
-          
+
+          // 알림 목록 새로고침
+          loadAlerts();
         } catch (error) {
-          console.error('사용자 정보 저장 오류:', error);
-          document.getElementById('user-error').textContent = error.message;
-          document.getElementById('user-error').classList.remove('hidden');
+          console.error("알림 삭제 오류:", error);
+          alert("알림 삭제에 실패했습니다.");
         }
-      });
+      }
+
+      // 관리자 권한으로 팁 삭제 함수
+      async function deleteTipAdmin(tipId) {
+        if (!confirm("정말로 이 팁을 삭제하시겠습니까?")) {
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_BASE_URL}/tips/${tipId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Admin-Override": "true",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("팁 삭제에 실패했습니다.");
+          }
+
+          // 팁 목록 새로고침
+          loadTips();
+          // 댓글 목록도 새로고침
+          loadTipComments();
+        } catch (error) {
+          console.error("팁 삭제 오류:", error);
+          alert("팁 삭제에 실패했습니다.");
+        }
+      }
+
+      // 관리자 권한으로 팁 댓글 삭제 함수
+      async function deleteTipCommentAdmin(commentId) {
+        if (!confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(
+            `${API_BASE_URL}/tips/comments/${commentId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Admin-Override": "true",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("댓글 삭제에 실패했습니다.");
+          }
+
+          // 댓글 목록 새로고침
+          loadTipComments();
+        } catch (error) {
+          console.error("댓글 삭제 오류:", error);
+          alert("댓글 삭제에 실패했습니다.");
+        }
+      }
+
+      // 특정 팁의 댓글 보기
+      function viewTipComments(tipId) {
+        try {
+          const token = localStorage.getItem("token");
+
+          // 팁 정보 가져오기
+          fetch(`${API_BASE_URL}/tips?_id=${tipId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("팁 정보를 불러오는데 실패했습니다.");
+              }
+              return response.json();
+            })
+            .then((tips) => {
+              if (!tips || tips.length === 0) {
+                throw new Error("팁을 찾을 수 없습니다.");
+              }
+
+              const tip = tips[0];
+
+              // 모달에 팁 정보 표시
+              document.getElementById(
+                "tip-comments-modal-content"
+              ).textContent = tip.content;
+              document.getElementById(
+                "tip-comments-modal-author"
+              ).textContent = `작성자: ${tip.authorName || "익명"}`;
+              document.getElementById(
+                "tip-comments-modal-date"
+              ).textContent = `작성일: ${tip.createdAt}`;
+
+              // 댓글 목록 표시
+              const commentsList = document.getElementById(
+                "tip-comments-modal-list"
+              );
+
+              if (!tip.comments || tip.comments.length === 0) {
+                commentsList.innerHTML = `<p class="text-center text-gray-500 py-4">댓글이 없습니다.</p>`;
+              } else {
+                commentsList.innerHTML = tip.comments
+                  .map(
+                    (comment) => `
+                <div class="p-3 bg-gray-50 rounded-md">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <p class="text-gray-800">${comment.content}</p>
+                      <p class="text-xs text-gray-500 mt-1">작성자: ${
+                        comment.authorName || "익명"
+                      } | 작성일: ${comment.createdAt}</p>
+                    </div>
+                    <button class="text-danger hover:text-red-700" onclick="deleteTipCommentAdmin('${
+                      comment._id
+                    }'); document.getElementById('tip-comments-modal').classList.add('hidden');">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                  ${
+                    comment.parentId
+                      ? '<div class="ml-4 mt-1 text-xs text-gray-500">(답글)</div>'
+                      : ""
+                  }
+                </div>
+              `
+                  )
+                  .join("");
+              }
+
+              // 모달 표시
+              document
+                .getElementById("tip-comments-modal")
+                .classList.remove("hidden");
+            })
+            .catch((error) => {
+              console.error("팁 댓글 보기 오류:", error);
+              alert(error.message || "팁 댓글을 불러오는데 실패했습니다.");
+            });
+        } catch (error) {
+          console.error("팁 댓글 보기 오류:", error);
+          alert("팁 댓글을 불러오는데 실패했습니다.");
+        }
+      }
+
+      // 팁 댓글 모달 닫기
+      document
+        .getElementById("close-tip-comments-modal")
+        .addEventListener("click", function () {
+          document.getElementById("tip-comments-modal").classList.add("hidden");
+        });
     </script>
-</body>
+  </body>
 </html>

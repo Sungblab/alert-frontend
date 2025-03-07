@@ -6,13 +6,19 @@
     <title>로그인 - 수행평가 알리미</title>
     <!-- PWA 관련 메타 태그 -->
     <meta name="theme-color" content="#4f46e5" />
-    <meta name="description" content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스" />
+    <meta
+      name="description"
+      content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/android-chrome-192x192" />
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Pretendard 폰트 -->
@@ -54,7 +60,7 @@
   </head>
   <body class="bg-gray-50 min-h-screen mobile-nav-padding">
     <!-- 헤더 - 데스크톱에서만 표시 -->
-    <header class="bg-white shadow-sm hidden md:block">
+    <header class="hidden md:block">
       <div
         class="container mx-auto px-4 py-4 flex justify-between items-center"
       >
@@ -85,14 +91,14 @@
     </header>
 
     <!-- 모바일 헤더 - 모바일에서만 표시 -->
-    <header class="bg-white shadow-sm md:hidden">
+    <header class="md:hidden">
       <div class="container mx-auto px-4 py-4 flex justify-center items-center">
         <h1 class="text-xl font-bold text-primary">수행평가 알리미</h1>
       </div>
     </header>
 
     <!-- 메인 컨텐츠 -->
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-24">
       <!-- 로그인 섹션 -->
       <section class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-2xl font-semibold mb-6 text-center">로그인</h2>
@@ -140,7 +146,10 @@
               </label>
             </div>
 
-            <a href="find-password.html" class="text-sm text-primary hover:underline">
+            <a
+              href="find-password.html"
+              class="text-sm text-primary hover:underline"
+            >
               비밀번호 찾기
             </a>
           </div>
@@ -169,15 +178,15 @@
     </main>
 
     <!-- 푸터 -->
-    <footer class=" text-white hidden md:block">
+    <footer class="py-4 text-black hidden md:block">
       <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="mb-4 md:mb-0">
-            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
-            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+            <h2 class="text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-sm mt-1">학교 생활을 더 편리하게</p>
           </div>
           <div>
-            <p class="text-sm text-black">
+            <p class="text-sm">
               &copy; 2025 수행평가 알리미. All rights reserved.
             </p>
           </div>
@@ -225,78 +234,95 @@
     <script>
       // API 기본 URL
       const API_BASE_URL = "http://localhost:5000/api";
-      
+
       document.addEventListener("DOMContentLoaded", function () {
-        console.log("로그인 페이지가 로드되었습니다.");
-        
         // 이미 로그인되어 있는지 확인
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token) {
           // 이미 로그인된 상태면 홈페이지로 리다이렉트
-          window.location.href = 'index.html';
+          window.location.href = "index.html";
           return;
         }
-        
+
         // 로그인 폼 제출 처리
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        
-        loginForm.addEventListener('submit', async function(e) {
+        const loginForm = document.getElementById("login-form");
+        const loginError = document.getElementById("login-error");
+
+        loginForm.addEventListener("submit", async function (e) {
           e.preventDefault();
-          
+
           // 로그인 버튼 비활성화
           const submitButton = loginForm.querySelector('button[type="submit"]');
           submitButton.disabled = true;
-          submitButton.textContent = '로그인 중...';
-          
+          submitButton.textContent = "로그인 중...";
+
           // 에러 메시지 초기화
-          loginError.classList.add('hidden');
-          loginError.textContent = '';
-          
+          loginError.classList.add("hidden");
+          loginError.textContent = "";
+
           // 폼 데이터 수집
-          const email = document.getElementById('email').value;
-          const password = document.getElementById('password').value;
-          const rememberMe = document.getElementById('remember-me').checked;
-          
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const rememberMe = document.getElementById("remember-me").checked;
+
           try {
             // API 호출
             const response = await fetch(`${API_BASE_URL}/users/login`, {
-              method: 'POST',
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
               },
-              body: JSON.stringify({ email, password })
+              body: JSON.stringify({ email, password }),
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
-              throw new Error(data.message || '로그인에 실패했습니다.');
+              throw new Error(data.message || "로그인에 실패했습니다.");
             }
-            
+
             // 로그인 성공 처리
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
+            console.log("로그인 응답 데이터:", data);
+            if (!data.accessToken) {
+              throw new Error("액세스 토큰이 없습니다.");
+            }
+
+            // 토큰 저장 전 로그
+            console.log("저장할 액세스 토큰:", data.accessToken);
+            console.log("저장할 리프레시 토큰:", data.refreshToken);
+
+            // 토큰 저장
+            localStorage.setItem("token", data.accessToken);
+            localStorage.setItem("refreshToken", data.refreshToken);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            // 토큰이 제대로 저장되었는지 확인
+            const savedToken = localStorage.getItem("token");
+            const savedRefreshToken = localStorage.getItem("refreshToken");
+            const savedUser = localStorage.getItem("user");
+            console.log("저장된 액세스 토큰:", savedToken);
+            console.log("저장된 리프레시 토큰:", savedRefreshToken);
+            console.log("저장된 사용자 정보:", savedUser);
+
             // 로그인 상태 유지 설정
             if (rememberMe) {
-              localStorage.setItem('rememberMe', 'true');
+              localStorage.setItem("rememberMe", "true");
             } else {
-              localStorage.removeItem('rememberMe');
+              localStorage.removeItem("rememberMe");
             }
-            
+
             // 홈페이지로 리다이렉트
-            window.location.href = 'index.html';
+            window.location.href = "index.html";
           } catch (error) {
-            console.error('로그인 오류:', error);
-            
+            console.error("로그인 오류:", error);
+
             // 에러 메시지 표시
             loginError.textContent = error.message;
-            loginError.classList.remove('hidden');
-            
+            loginError.classList.remove("hidden");
+
             // 로그인 버튼 활성화
             submitButton.disabled = false;
-            submitButton.textContent = '로그인';
+            submitButton.textContent = "로그인";
           }
         });
       });

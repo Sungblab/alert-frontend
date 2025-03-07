@@ -7,13 +7,19 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="theme-color" content="#4f46e5" />
-    <meta name="description" content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스" />
+    <meta
+      name="description"
+      content="학교 수행평가 일정을 관리하고 알림을 받을 수 있는 서비스"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="수행평가 알리미" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/android-chrome-192x192" />
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes" />
     <!-- Pretendard 폰트 -->
     <link
       rel="stylesheet"
@@ -25,6 +31,12 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <!-- 카카오톡 공유 SDK -->
+    <script
+      src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js"
+      integrity="sha384-kYPsUbBPlktXsY6/oNHSUDZoTX6+YI51f63jCPEIPFP09ttByAdxd2mEjKuhdqn4"
+      crossorigin="anonymous"
+    ></script>
     <style>
       body {
         font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
@@ -69,6 +81,78 @@
         background-color: #e0e7ff;
         color: #3730a3;
       }
+      /* 알림 카드 스타일 */
+      .alert-card {
+        transition: all 0.2s ease;
+      }
+      .alert-card:hover {
+        transform: translateY(-2px);
+      }
+      /* 공유 모달 스타일 */
+      .share-option {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+      }
+      .share-option:hover {
+        background-color: #f3f4f6;
+      }
+      .share-icon {
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+      }
+      /* 모바일 최적화 알림 카드 */
+      @media (max-width: 768px) {
+        .alert-card-mobile {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 0.5rem;
+        }
+        .alert-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .alert-card-content {
+          max-height: 3.6em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+      }
+
+      /* 알림 설정 토글 애니메이션 */
+      #notification-settings-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, opacity 0.3s ease-out,
+          margin 0.3s ease-out;
+        opacity: 0;
+        margin-top: 0;
+      }
+
+      #notification-settings-content.show {
+        max-height: 500px; /* 충분히 큰 값으로 설정 */
+        opacity: 1;
+        margin-top: 1rem;
+      }
+
+      #notification-settings-toggle {
+        transition: transform 0.3s ease;
+      }
+
+      #notification-settings-toggle.rotate {
+        transform: rotate(180deg);
+      }
     </style>
     <script>
       tailwind.config = {
@@ -84,52 +168,149 @@
         },
       };
     </script>
+    <!-- 푸시 알림 관련 스크립트 -->
+    <script src="pwa.js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen mobile-nav-padding">
     <!-- 헤더 - 데스크톱에서만 표시 -->
-    <header class="bg-white shadow-sm hidden md:block">
+    <header class="hidden md:block">
       <div
         class="container mx-auto px-4 py-4 flex justify-between items-center"
       >
         <h1 class="text-2xl font-bold text-primary">수행평가 알리미</h1>
-        <nav>
-          <ul class="flex space-x-4">
-            <li>
-              <a href="index.html" class="text-gray-600 hover:text-primary"
-                >홈</a
-              >
-            </li>
-            <li>
-              <a href="alerts.html" class="text-primary font-medium">알리미</a>
-            </li>
-            <li>
-              <a href="profile.html" class="text-gray-600 hover:text-primary"
-                >내 정보</a
-              >
-            </li>
-            <li>
-              <a href="login.html" class="text-gray-600 hover:text-primary"
-                >로그인</a
-              >
-            </li>
-          </ul>
-        </nav>
+        <div class="flex items-center space-x-4">
+          <button
+            id="install-button"
+            class="text-white bg-primary hover:bg-primary-dark px-4 py-2 rounded-md hidden"
+          >
+            앱 설치하기
+          </button>
+          <nav>
+            <ul class="flex space-x-4">
+              <li>
+                <a href="index.html" class="text-primary font-medium">홈</a>
+              </li>
+              <li>
+                <a href="alerts.html" class="text-gray-600 hover:text-primary"
+                  >알리미</a
+                >
+              </li>
+              <li>
+                <a href="profile.html" class="text-gray-600 hover:text-primary"
+                  >내 정보</a
+                >
+              </li>
+              <li>
+                <a href="login.html" class="text-gray-600 hover:text-primary"
+                  >로그인</a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </header>
 
     <!-- 모바일 헤더 - 모바일에서만 표시 -->
-    <header class="bg-white shadow-sm md:hidden">
-      <div class="container mx-auto px-4 py-4 flex justify-center items-center">
-        <h1 class="text-xl font-bold text-primary">알림 관리</h1>
+    <header class="md:hidden">
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-xl font-bold text-primary">수행평가 알리미</h1>
       </div>
     </header>
 
     <!-- 메인 컨텐츠 -->
     <main class="container mx-auto px-4 py-8">
+      <!-- 알림 설정 섹션 -->
+      <section class="bg-white rounded-lg shadow-md p-4 mb-2">
+        <!-- 알림 설정 헤더 (토글 기능 추가) -->
+        <div
+          class="flex items-center justify-between cursor-pointer"
+          id="notification-settings-header"
+        >
+          <div class="flex items-center">
+            <h3 class="font-medium text-lg">알림 설정</h3>
+            <span
+              class="ml-2 text-sm text-gray-500"
+              id="notification-settings-status"
+              >펼치기</span
+            >
+          </div>
+          <button
+            class="text-gray-500 hover:text-primary transition-transform duration-300"
+            id="notification-settings-toggle"
+          >
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+
+        <!-- 알림 설정 내용 (접을 수 있는 부분) -->
+        <div id="notification-settings-content">
+          <!-- 푸시 알림 설정 -->
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="font-medium">푸시 알림</p>
+              <p class="text-sm text-gray-600">
+                수행평가 마감 하루 전과 <br />매일 아침에 알림을 받습니다.
+              </p>
+            </div>
+            <button
+              id="push-subscribe-button"
+              class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
+            >
+              알림 구독
+            </button>
+            <button
+              id="push-unsubscribe-button"
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition hidden"
+            >
+              구독 취소하기
+            </button>
+          </div>
+          <div id="push-status" class="text-sm text-gray-600 mt-2"></div>
+
+          <!-- 지속적인 알림 설정 추가 -->
+          <div class="border-t border-gray-200 mt-4 pt-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium">항상 표시되는 알림</p>
+                <p class="text-sm text-gray-600">
+                  가장 가까운 수행평가 마감일을 <br />항상 알림으로 표시합니다.
+                </p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="persistent-notification-toggle"
+                  class="sr-only peer"
+                />
+                <div
+                  class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+                ></div>
+              </label>
+            </div>
+            <div class="flex items-center mt-2">
+              <span class="text-sm mr-2">상태:</span>
+              <span
+                id="persistent-notification-status"
+                class="text-sm text-gray-600"
+                >비활성화됨</span
+              >
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              * 이 기능은 앱이 설치된 모바일 기기에서 가장 잘 작동합니다. <br />
+              * 일부 기기에서는 시스템 설정에 따라 항상 표시되지 않을 수
+              있습니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <!-- 알림 관리 섹션 -->
       <section class="bg-white rounded-lg shadow-md p-6 mb-8">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold">알림 관리</h2>
+          <h2 class="text-xl font-semibold">수행 목록</h2>
           <button
             id="create-alert-btn"
             class="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition flex items-center"
@@ -181,13 +362,17 @@
         <!-- 알림 목록 -->
         <div class="space-y-4" id="alerts-container">
           <!-- 알림이 없을 경우 표시될 메시지 -->
-          <div id="no-alerts-message" class="text-center py-8 text-gray-500 hidden">
+          <div
+            id="no-alerts-message"
+            class="text-center py-8 text-gray-500 hidden"
+          >
             등록된 알림이 없습니다.
           </div>
 
           <!-- 로딩 표시 -->
           <div id="alerts-loading" class="text-center py-8">
-            <i class="fas fa-spinner fa-spin text-primary mr-2"></i> 알림을 불러오는 중...
+            <i class="fas fa-spinner fa-spin text-primary mr-2"></i> 알림을
+            불러오는 중...
           </div>
         </div>
 
@@ -255,15 +440,41 @@
             </div>
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1"
-                >알림 옵션</label
+                >작성자 설정</label
               >
-              <div class="flex items-center">
-                <input type="checkbox" id="alert-notify" class="mr-2" />
-                <label for="alert-notify" class="text-sm text-gray-700"
-                  >마감일에 알림 받기</label
+              <div class="flex items-center mb-2">
+                <input
+                  type="radio"
+                  id="anonymous-author"
+                  name="author-type"
+                  value="anonymous"
+                  class="mr-2"
+                  checked
+                />
+                <label for="anonymous-author" class="text-sm text-gray-700 mr-4"
+                  >익명으로 작성</label
+                >
+                <input
+                  type="radio"
+                  id="named-author"
+                  name="author-type"
+                  value="named"
+                  class="mr-2"
+                />
+                <label for="named-author" class="text-sm text-gray-700"
+                  >이름 지정</label
                 >
               </div>
+              <div id="author-name-container" class="hidden">
+                <input
+                  type="text"
+                  id="alert-author-name"
+                  class="w-full p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
+                  placeholder="작성자 이름을 입력하세요"
+                />
+              </div>
             </div>
+
             <div class="flex justify-end space-x-2">
               <button
                 type="button"
@@ -290,8 +501,13 @@
       >
         <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
           <div class="flex justify-between items-center mb-4">
-            <h3 id="modal-alert-title" class="text-lg font-semibold">알림 제목</h3>
-            <button id="close-detail-modal" class="text-gray-500 hover:text-gray-700">
+            <h3 id="modal-alert-title" class="text-lg font-semibold">
+              알림 제목
+            </h3>
+            <button
+              id="close-detail-modal"
+              class="text-gray-500 hover:text-gray-700"
+            >
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -299,12 +515,16 @@
             <div class="flex justify-between items-center mb-2">
               <div class="flex items-center">
                 <i class="far fa-calendar-alt text-gray-500 mr-2"></i>
-                <span id="modal-alert-date" class="text-sm text-gray-600">날짜</span>
+                <span id="modal-alert-date" class="text-sm text-gray-600"
+                  >날짜</span
+                >
               </div>
               <div id="modal-alert-author" class="text-sm text-gray-500"></div>
             </div>
             <div class="border-t border-gray-200 pt-3 mt-2">
-              <p id="modal-alert-description" class="text-gray-700">알림 내용</p>
+              <p id="modal-alert-description" class="text-gray-700">
+                알림 내용
+              </p>
             </div>
           </div>
           <div class="flex justify-end space-x-2">
@@ -329,25 +549,96 @@
           </div>
         </div>
       </div>
+
+      <!-- 알림 공유 모달 -->
+      <div
+        id="share-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+      >
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">알림 공유하기</h3>
+            <button
+              id="close-share-modal"
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-4">
+              이 알림을 다른 사람들과 공유하세요:
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="share-option" id="share-kakao">
+                <div class="share-icon bg-yellow-400 text-black">
+                  <i class="fas fa-comment"></i>
+                </div>
+                <span>카카오톡</span>
+              </div>
+              <div class="share-option" id="share-clipboard">
+                <div class="share-icon bg-gray-200 text-gray-700">
+                  <i class="far fa-clipboard"></i>
+                </div>
+                <span>클립보드 복사</span>
+              </div>
+              <div class="share-option" id="share-message">
+                <div class="share-icon bg-green-500 text-white">
+                  <i class="fas fa-sms"></i>
+                </div>
+                <span>문자 메시지</span>
+              </div>
+              <div class="share-option" id="share-native">
+                <div class="share-icon bg-blue-500 text-white">
+                  <i class="fas fa-share-alt"></i>
+                </div>
+                <span>기기 공유</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="mb-3">
+              <label
+                for="share-url"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >공유 링크</label
+              >
+              <div class="flex">
+                <input
+                  type="text"
+                  id="share-url"
+                  readonly
+                  class="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring-primary focus:border-primary text-sm"
+                />
+                <button
+                  id="copy-url-btn"
+                  class="bg-primary text-white px-3 py-2 rounded-r-md hover:bg-indigo-600"
+                >
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- 푸터 -->
-    <footer class=" text-white hidden md:block">
+    <footer class="py-4 text-black hidden md:block">
       <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="mb-4 md:mb-0">
-            <h2 class="text-black text-xl font-bold">수행평가 알리미</h2>
-            <p class="text-black text-sm mt-1">학교 생활을 더 편리하게</p>
+            <h2 class="text-xl font-bold">수행평가 알리미</h2>
+            <p class="text-sm mt-1">학교 생활을 더 편리하게</p>
           </div>
           <div>
-            <p class="text-sm text-black">
+            <p class="text-sm">
               &copy; 2025 수행평가 알리미. All rights reserved.
             </p>
           </div>
         </div>
       </div>
     </footer>
-
     <!-- 모바일 하단 네비게이션 바 -->
     <nav
       class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200"
@@ -388,11 +679,11 @@
     <script>
       // API 기본 URL
       const API_BASE_URL = "http://localhost:5000/api";
-      
+
       // 전역 변수
       let selectedSchool = ""; // 기본값 없음
-      let selectedGrade = "";  // 기본값 없음
-      let selectedClass = "";  // 기본값 없음
+      let selectedGrade = ""; // 기본값 없음
+      let selectedClass = ""; // 기본값 없음
       let alerts = [];
       let editingAlertId = null;
       let isLoggedIn = false;
@@ -400,19 +691,29 @@
       let currentPage = 1;
       let totalPages = 1;
       let itemsPerPage = 5; // 페이지당 표시할 알림 수
+      let pushSubscription = null;
 
       document.addEventListener("DOMContentLoaded", function () {
-        console.log("알리미 페이지가 로드되었습니다.");
-        
+        // 카카오톡 SDK 초기화
+        if (window.Kakao && !window.Kakao.isInitialized()) {
+          window.Kakao.init("13c8156dd4ef235b5242d89a05daa6c3");
+          console.log("SDK 초기화 성공:", window.Kakao.isInitialized());
+        }
+
         // 로그인 상태 확인
         checkLoginStatus();
-        
+
         // URL 파라미터 확인 (수정 모드인지 확인)
         const urlParams = new URLSearchParams(window.location.search);
         const editId = urlParams.get("edit");
+        const viewId = urlParams.get("view");
+
         if (editId) {
           editingAlertId = editId;
           openEditModal(editId);
+        } else if (viewId) {
+          // 공유된 알림 보기
+          fetchAndShowSharedAlert(viewId);
         }
 
         // 모달 관련 요소
@@ -421,21 +722,89 @@
         const closeModalBtn = document.getElementById("close-modal");
         const cancelAlertBtn = document.getElementById("cancel-alert");
         const createAlertForm = document.getElementById("create-alert-form");
-        
+
+        // 작성자 설정 관련 요소
+        const anonymousAuthorRadio =
+          document.getElementById("anonymous-author");
+        const namedAuthorRadio = document.getElementById("named-author");
+        const authorNameContainer = document.getElementById(
+          "author-name-container"
+        );
+
+        // 작성자 타입 라디오 버튼 이벤트 처리
+        if (anonymousAuthorRadio && namedAuthorRadio && authorNameContainer) {
+          anonymousAuthorRadio.addEventListener("change", function () {
+            if (this.checked) {
+              authorNameContainer.classList.add("hidden");
+            }
+          });
+
+          namedAuthorRadio.addEventListener("change", function () {
+            if (this.checked) {
+              authorNameContainer.classList.remove("hidden");
+            }
+          });
+        }
+
         // 상세보기 모달 관련 요소
         const alertDetailModal = document.getElementById("alert-detail-modal");
-        const closeDetailModalBtn = document.getElementById("close-detail-modal");
-        
+        const closeDetailModalBtn =
+          document.getElementById("close-detail-modal");
+
+        // 알림 설정 토글 관련 요소
+        const notificationSettingsHeader = document.getElementById(
+          "notification-settings-header"
+        );
+        const notificationSettingsToggle = document.getElementById(
+          "notification-settings-toggle"
+        );
+        const notificationSettingsContent = document.getElementById(
+          "notification-settings-content"
+        );
+        const notificationSettingsStatus = document.getElementById(
+          "notification-settings-status"
+        );
+
+        // 알림 설정 토글 상태 불러오기
+        const isNotificationSettingsOpen =
+          localStorage.getItem("notificationSettingsOpen") === "true";
+
+        // 초기 상태 설정
+        if (isNotificationSettingsOpen) {
+          notificationSettingsContent.classList.add("show");
+          notificationSettingsToggle.classList.add("rotate");
+          notificationSettingsStatus.textContent = "접기";
+        }
+
+        // 알림 설정 토글 이벤트
+        notificationSettingsHeader.addEventListener("click", function () {
+          const isOpen = notificationSettingsContent.classList.contains("show");
+
+          if (isOpen) {
+            // 열려있으면 닫기
+            notificationSettingsContent.classList.remove("show");
+            notificationSettingsToggle.classList.remove("rotate");
+            notificationSettingsStatus.textContent = "펼치기";
+            localStorage.setItem("notificationSettingsOpen", "false");
+          } else {
+            // 닫혀있으면 열기
+            notificationSettingsContent.classList.add("show");
+            notificationSettingsToggle.classList.add("rotate");
+            notificationSettingsStatus.textContent = "접기";
+            localStorage.setItem("notificationSettingsOpen", "true");
+          }
+        });
+
         // 상세보기 모달 닫기 버튼 이벤트
         if (closeDetailModalBtn) {
-          closeDetailModalBtn.addEventListener("click", function() {
+          closeDetailModalBtn.addEventListener("click", function () {
             alertDetailModal.classList.add("hidden");
           });
         }
-        
+
         // 상세보기 모달 외부 클릭 시 닫기
         if (alertDetailModal) {
-          alertDetailModal.addEventListener("click", function(e) {
+          alertDetailModal.addEventListener("click", function (e) {
             if (e.target === alertDetailModal) {
               alertDetailModal.classList.add("hidden");
             }
@@ -445,11 +814,13 @@
         // 모달 열기
         createAlertBtn.addEventListener("click", function () {
           // 모달 제목 설정 (h3 요소 직접 선택)
-          const modalTitle = createAlertModal.querySelector(".flex.justify-between.items-center h3");
+          const modalTitle = createAlertModal.querySelector(
+            ".flex.justify-between.items-center h3"
+          );
           if (modalTitle) {
             modalTitle.textContent = "새 알림 만들기";
           }
-          
+
           editingAlertId = null;
           createAlertForm.reset();
           createAlertModal.classList.remove("hidden");
@@ -480,8 +851,18 @@
           // 폼 데이터 수집
           const title = document.getElementById("alert-title").value;
           const date = document.getElementById("alert-date").value;
-          const description = document.getElementById("alert-description").value;
-          const notify = document.getElementById("alert-notify").checked;
+          const description =
+            document.getElementById("alert-description").value;
+          const notify = false; // 알림 옵션 기본값 false로 설정
+
+          // 작성자 정보 수집
+          const isAnonymous =
+            document.getElementById("anonymous-author").checked;
+          let authorName = "";
+
+          if (!isAnonymous) {
+            authorName = document.getElementById("alert-author-name").value;
+          }
 
           // 알림 데이터 객체 생성
           const alertData = {
@@ -491,36 +872,41 @@
             notify,
             school: selectedSchool,
             grade: selectedGrade,
-            class: selectedClass
+            class: selectedClass,
+            isAnonymous,
+            authorName,
           };
 
           try {
             let response;
-            
+
             // 헤더 설정
             const headers = {
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             };
-            
+
             // 로그인한 경우 토큰 추가
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
             if (token) {
-              headers['Authorization'] = `Bearer ${token}`;
+              headers["Authorization"] = `Bearer ${token}`;
             }
-            
+
             if (editingAlertId) {
               // 기존 알림 수정
-              response = await fetch(`${API_BASE_URL}/alerts/${editingAlertId}`, {
-                method: "PUT",
-                headers,
-                body: JSON.stringify(alertData)
-              });
+              response = await fetch(
+                `${API_BASE_URL}/alerts/${editingAlertId}`,
+                {
+                  method: "PUT",
+                  headers,
+                  body: JSON.stringify(alertData),
+                }
+              );
             } else {
               // 새 알림 생성
               response = await fetch(`${API_BASE_URL}/alerts`, {
                 method: "POST",
                 headers,
-                body: JSON.stringify(alertData)
+                body: JSON.stringify(alertData),
               });
             }
 
@@ -530,7 +916,6 @@
             }
 
             const result = await response.json();
-            console.log("알림 저장 성공:", result);
 
             // 모달 닫기
             closeModal();
@@ -541,8 +926,15 @@
             // 알림 목록 새로고침
             fetchAlerts();
 
+            // 지속적인 알림 업데이트
+            updatePersistentNotification();
+
             // 성공 메시지 표시
-            alert(editingAlertId ? "알림이 성공적으로 수정되었습니다!" : "새 알림이 성공적으로 생성되었습니다!");
+            alert(
+              editingAlertId
+                ? "알림이 성공적으로 수정되었습니다!"
+                : "새 알림이 성공적으로 생성되었습니다!"
+            );
           } catch (error) {
             console.error("알림 저장 오류:", error);
             alert(error.message || "알림 저장 중 오류가 발생했습니다.");
@@ -561,70 +953,223 @@
 
         // 초기 알림 목록 로드
         fetchAlerts();
+
+        // 푸시 알림 구독 버튼 이벤트 리스너 추가
+        setupPushNotificationButtons();
+
+        // 푸시 알림 구독 상태 확인
+        checkPushSubscription();
+
+        // 지속적인 알림 토글 설정
+        setupPersistentNotificationToggle();
       });
-      
+
+      // 지속적인 알림 토글 설정
+      function setupPersistentNotificationToggle() {
+        const persistentToggle = document.getElementById(
+          "persistent-notification-toggle"
+        );
+        const persistentStatus = document.getElementById(
+          "persistent-notification-status"
+        );
+
+        if (!persistentToggle || !persistentStatus) return;
+
+        // 현재 상태 확인
+        const isEnabled =
+          localStorage.getItem("persistentNotificationEnabled") === "true";
+        persistentToggle.checked = isEnabled;
+        persistentStatus.textContent = isEnabled ? "활성화됨" : "비활성화됨";
+        persistentStatus.className = isEnabled
+          ? "text-sm text-green-600"
+          : "text-sm text-gray-600";
+
+        // 토글 이벤트 리스너
+        persistentToggle.addEventListener("change", function () {
+          if (this.checked) {
+            // 알림 권한 확인 및 요청
+            if (Notification.permission === "granted") {
+              startPersistentNotification();
+            } else if (Notification.permission !== "denied") {
+              Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                  startPersistentNotification();
+                } else {
+                  this.checked = false;
+                  alert(
+                    "항상 표시되는 알림을 사용하려면 알림 권한이 필요합니다."
+                  );
+                }
+              });
+            } else {
+              this.checked = false;
+              alert("브라우저 설정에서 알림 권한을 허용해주세요.");
+            }
+          } else {
+            stopPersistentNotification();
+          }
+        });
+      }
+
+      // 지속적인 알림 시작
+      function startPersistentNotification() {
+        if (
+          "serviceWorker" in navigator &&
+          navigator.serviceWorker.controller
+        ) {
+          navigator.serviceWorker.controller.postMessage({
+            action: "START_PERSISTENT_NOTIFICATION",
+          });
+          localStorage.setItem("persistentNotificationEnabled", "true");
+
+          // UI 업데이트
+          const persistentToggle = document.getElementById(
+            "persistent-notification-toggle"
+          );
+          const persistentStatus = document.getElementById(
+            "persistent-notification-status"
+          );
+
+          if (persistentToggle) persistentToggle.checked = true;
+          if (persistentStatus) {
+            persistentStatus.textContent = "활성화됨";
+            persistentStatus.className = "text-sm text-green-600";
+          }
+        }
+      }
+
+      // 지속적인 알림 중지
+      function stopPersistentNotification() {
+        if (
+          "serviceWorker" in navigator &&
+          navigator.serviceWorker.controller
+        ) {
+          navigator.serviceWorker.controller.postMessage({
+            action: "STOP_PERSISTENT_NOTIFICATION",
+          });
+          localStorage.setItem("persistentNotificationEnabled", "false");
+
+          // UI 업데이트
+          const persistentToggle = document.getElementById(
+            "persistent-notification-toggle"
+          );
+          const persistentStatus = document.getElementById(
+            "persistent-notification-status"
+          );
+
+          if (persistentToggle) persistentToggle.checked = false;
+          if (persistentStatus) {
+            persistentStatus.textContent = "비활성화됨";
+            persistentStatus.className = "text-sm text-gray-600";
+          }
+        }
+      }
+
+      // 지속적인 알림 업데이트
+      function updatePersistentNotification() {
+        if (
+          "serviceWorker" in navigator &&
+          navigator.serviceWorker.controller &&
+          localStorage.getItem("persistentNotificationEnabled") === "true"
+        ) {
+          navigator.serviceWorker.controller.postMessage({
+            action: "UPDATE_PERSISTENT_NOTIFICATION",
+          });
+        }
+      }
+
       // 알림 수정 모달 열기
       async function openEditModal(alertId) {
         try {
           const response = await fetch(`${API_BASE_URL}/alerts/${alertId}`);
-          
+
           if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.message || "알림 정보를 가져오는데 실패했습니다.");
+            throw new Error(
+              data.message || "알림 정보를 가져오는데 실패했습니다."
+            );
           }
-          
+
           const alert = await response.json();
-          
+
           // 모달 요소 가져오기
-          const createAlertModal = document.getElementById("create-alert-modal");
-          
+          const createAlertModal =
+            document.getElementById("create-alert-modal");
+
           // 모달 제목 변경
-          const modalTitle = createAlertModal.querySelector(".flex.justify-between.items-center h3");
+          const modalTitle = createAlertModal.querySelector(
+            ".flex.justify-between.items-center h3"
+          );
           if (modalTitle) {
             modalTitle.textContent = "알림 수정";
           }
-          
+
           // 폼 필드에 데이터 채우기
           document.getElementById("alert-title").value = alert.title;
-          document.getElementById("alert-date").value = new Date(alert.date).toISOString().split('T')[0];
-          document.getElementById("alert-description").value = alert.description;
-          document.getElementById("alert-notify").checked = alert.notify;
-          
+          document.getElementById("alert-date").value = new Date(alert.date)
+            .toISOString()
+            .split("T")[0];
+          document.getElementById("alert-description").value =
+            alert.description;
+
+          // 작성자 정보 설정
+          const anonymousAuthorRadio =
+            document.getElementById("anonymous-author");
+          const namedAuthorRadio = document.getElementById("named-author");
+          const authorNameContainer = document.getElementById(
+            "author-name-container"
+          );
+          const authorNameInput = document.getElementById("alert-author-name");
+
+          if (alert.isAnonymous === false && alert.authorName) {
+            namedAuthorRadio.checked = true;
+            anonymousAuthorRadio.checked = false;
+            authorNameContainer.classList.remove("hidden");
+            authorNameInput.value = alert.authorName;
+          } else {
+            anonymousAuthorRadio.checked = true;
+            namedAuthorRadio.checked = false;
+            authorNameContainer.classList.add("hidden");
+            authorNameInput.value = "";
+          }
+
           // 모달 열기
           createAlertModal.classList.remove("hidden");
         } catch (error) {
           console.error("알림 정보 가져오기 오류:", error);
-          alert(error.message || "알림 정보를 가져오는 중 오류가 발생했습니다.");
+          alert(
+            error.message || "알림 정보를 가져오는 중 오류가 발생했습니다."
+          );
         }
       }
 
       // 로그인 상태 확인 및 UI 업데이트
       function checkLoginStatus() {
-        const token = localStorage.getItem('token');
-        const userStr = localStorage.getItem('user');
-        
+        const token = localStorage.getItem("token");
+        const userStr = localStorage.getItem("user");
+
         if (token && userStr) {
           try {
             // 사용자 정보 파싱
             currentUser = JSON.parse(userStr);
             isLoggedIn = true;
-            
+
             // UI 업데이트
             updateUIForLoggedInUser();
-            
+
             // 로그인된 사용자의 학교/학년/반 정보로 초기화
             if (currentUser) {
               selectedSchool = currentUser.school;
               selectedGrade = currentUser.grade;
               selectedClass = currentUser.class;
-              
+
               // 알림 데이터 로드
               setTimeout(() => {
                 fetchAlerts();
               }, 300);
             }
           } catch (error) {
-            console.error('사용자 정보 파싱 오류:', error);
+            console.error("사용자 정보 파싱 오류:", error);
             // 오류 발생 시 로그아웃 처리
             logout();
           }
@@ -632,168 +1177,174 @@
           isLoggedIn = false;
           currentUser = null;
           updateUIForLoggedOutUser();
-          
+
           // 비로그인 사용자는 로컬 스토리지에서 학교/학년/반 정보 불러오기
           loadSchoolSelectionFromLocalStorage();
         }
       }
-      
+
       // 로컬 스토리지에서 학교/학년/반 선택 불러오기
       function loadSchoolSelectionFromLocalStorage() {
-        const savedSelection = localStorage.getItem('schoolSelection');
-        
+        const savedSelection = localStorage.getItem("schoolSelection");
+
         if (savedSelection) {
           try {
             const selection = JSON.parse(savedSelection);
             selectedSchool = selection.school || "";
             selectedGrade = selection.grade || "";
             selectedClass = selection.class || "";
-            
-            console.log("로컬 스토리지에서 학교 정보 로드:", { selectedSchool, selectedGrade, selectedClass });
-            
+
             // 알림 데이터 로드 (학교 정보가 있는 경우에만)
             if (selectedSchool && selectedGrade && selectedClass) {
               setTimeout(() => {
                 fetchAlerts();
               }, 300);
             } else {
-              console.warn("학교 정보가 불완전합니다. 알림을 로드하지 않습니다.");
+              console.warn(
+                "학교 정보가 불완전합니다. 알림을 로드하지 않습니다."
+              );
             }
           } catch (error) {
-            console.error('학교 선택 정보 파싱 오류:', error);
+            console.error("학교 선택 정보 파싱 오류:", error);
           }
         } else {
           // 저장된 정보가 없으면 홈페이지로 리다이렉트
-          alert('먼저 홈페이지에서 학교와 학년, 반을 선택해주세요.');
-          window.location.href = 'index.html';
+          alert("먼저 홈페이지에서 학교와 학년, 반을 선택해주세요.");
+          window.location.href = "index.html";
         }
       }
-      
+
       // 로그인 상태 UI 업데이트
       function updateUIForLoggedInUser() {
         // 데스크톱 네비게이션 업데이트
-        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        const desktopNav = document.querySelector(
+          "header.hidden.md\\:block nav ul"
+        );
         if (desktopNav) {
-          const loginLi = desktopNav.querySelector('li:last-child');
+          const loginLi = desktopNav.querySelector("li:last-child");
           if (loginLi) {
             loginLi.innerHTML = `
               <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">로그아웃</a>
             `;
-            
+
             // 로그아웃 버튼 이벤트 추가
-            const logoutBtn = document.getElementById('logout-btn');
+            const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
-              logoutBtn.addEventListener('click', function(e) {
+              logoutBtn.addEventListener("click", function (e) {
                 e.preventDefault();
                 logout();
               });
             }
           }
         }
-        
+
         // 모바일 네비게이션 업데이트
-        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        const mobileNav = document.querySelector("nav.md\\:hidden .flex");
         if (mobileNav) {
-          const loginLink = mobileNav.querySelector('a:last-child');
+          const loginLink = mobileNav.querySelector("a:last-child");
           if (loginLink) {
-            loginLink.href = '#';
-            loginLink.classList.remove('text-primary');
-            loginLink.classList.add('text-gray-600');
-            
-            const icon = loginLink.querySelector('i');
+            loginLink.href = "#";
+            loginLink.classList.remove("text-primary");
+            loginLink.classList.add("text-gray-600");
+
+            const icon = loginLink.querySelector("i");
             if (icon) {
-              icon.classList.remove('fa-sign-in-alt');
-              icon.classList.add('fa-sign-out-alt');
+              icon.classList.remove("fa-sign-in-alt");
+              icon.classList.add("fa-sign-out-alt");
             }
-            
-            const span = loginLink.querySelector('span');
+
+            const span = loginLink.querySelector("span");
             if (span) {
-              span.textContent = '로그아웃';
+              span.textContent = "로그아웃";
             }
-            
+
             // 로그아웃 이벤트 추가
-            loginLink.addEventListener('click', function(e) {
+            loginLink.addEventListener("click", function (e) {
               e.preventDefault();
               logout();
             });
           }
         }
-        
+
         // 사용자 정보 표시 (선택적)
         if (currentUser) {
           // 사용자 이름 표시 영역 추가 (없는 경우)
-          const headerContainer = document.querySelector('header.hidden.md\\:block .container');
-          if (headerContainer && !document.getElementById('user-info')) {
-            const userInfo = document.createElement('div');
-            userInfo.id = 'user-info';
-            userInfo.className = 'text-sm text-gray-600';
+          const headerContainer = document.querySelector(
+            "header.hidden.md\\:block .container"
+          );
+          if (headerContainer && !document.getElementById("user-info")) {
+            const userInfo = document.createElement("div");
+            userInfo.id = "user-info";
+            userInfo.className = "text-sm text-gray-600";
             userInfo.innerHTML = `<span class="font-medium">${currentUser.name}</span>님 환영합니다`;
             headerContainer.appendChild(userInfo);
           }
         }
       }
-      
+
       // 로그아웃 상태 UI 업데이트
       function updateUIForLoggedOutUser() {
         // 데스크톱 네비게이션 업데이트
-        const desktopNav = document.querySelector('header.hidden.md\\:block nav ul');
+        const desktopNav = document.querySelector(
+          "header.hidden.md\\:block nav ul"
+        );
         if (desktopNav) {
-          const loginLi = desktopNav.querySelector('li:last-child');
+          const loginLi = desktopNav.querySelector("li:last-child");
           if (loginLi) {
             loginLi.innerHTML = `
               <a href="login.html" class="text-gray-600 hover:text-primary">로그인</a>
             `;
           }
         }
-        
+
         // 모바일 네비게이션 업데이트
-        const mobileNav = document.querySelector('nav.md\\:hidden .flex');
+        const mobileNav = document.querySelector("nav.md\\:hidden .flex");
         if (mobileNav) {
-          const loginLink = mobileNav.querySelector('a:last-child');
+          const loginLink = mobileNav.querySelector("a:last-child");
           if (loginLink) {
-            loginLink.href = 'login.html';
-            loginLink.classList.remove('text-primary');
-            loginLink.classList.add('text-gray-600');
-            
-            const icon = loginLink.querySelector('i');
+            loginLink.href = "login.html";
+            loginLink.classList.remove("text-primary");
+            loginLink.classList.add("text-gray-600");
+
+            const icon = loginLink.querySelector("i");
             if (icon) {
-              icon.classList.remove('fa-sign-out-alt');
-              icon.classList.add('fa-sign-in-alt');
+              icon.classList.remove("fa-sign-out-alt");
+              icon.classList.add("fa-sign-in-alt");
             }
-            
-            const span = loginLink.querySelector('span');
+
+            const span = loginLink.querySelector("span");
             if (span) {
-              span.textContent = '로그인';
+              span.textContent = "로그인";
             }
-            
+
             // 이벤트 리스너 제거
             loginLink.replaceWith(loginLink.cloneNode(true));
           }
         }
-        
+
         // 사용자 정보 제거
-        const userInfo = document.getElementById('user-info');
+        const userInfo = document.getElementById("user-info");
         if (userInfo) {
           userInfo.remove();
         }
       }
-      
+
       // 로그아웃 처리
       function logout() {
         // 로컬 스토리지에서 토큰 및 사용자 정보 제거
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('rememberMe');
-        
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("rememberMe");
+
         // 상태 변수 초기화
         isLoggedIn = false;
         currentUser = null;
-        
+
         // UI 업데이트
         updateUIForLoggedOutUser();
-        
+
         // 로그인 페이지로 리다이렉트
-        window.location.href = 'login.html';
+        window.location.href = "login.html";
       }
 
       // 알림 목록 가져오기
@@ -803,52 +1354,61 @@
           const loadingElement = document.getElementById("alerts-loading");
           const noAlertsMessage = document.getElementById("no-alerts-message");
           const alertsContainer = document.getElementById("alerts-container");
-          
+
           if (loadingElement) loadingElement.classList.remove("hidden");
           if (noAlertsMessage) noAlertsMessage.classList.add("hidden");
-          
+
           // 기존 알림 카드 제거
-          const existingAlerts = alertsContainer.querySelectorAll(".border.border-gray-200.rounded-md");
-          existingAlerts.forEach(alert => alert.remove());
-          
+          const existingAlerts = alertsContainer.querySelectorAll(
+            ".border.border-gray-200.rounded-md"
+          );
+          existingAlerts.forEach((alert) => alert.remove());
+
           // 필터 값 가져오기
           const date = document.getElementById("filter-date").value;
-          const searchTerm = document.getElementById("search-alert").value.toLowerCase();
-          
+          const searchTerm = document
+            .getElementById("search-alert")
+            .value.toLowerCase();
+
           // API 요청 URL 구성
           let url = `${API_BASE_URL}/alerts?school=${selectedSchool}&grade=${selectedGrade}&class=${selectedClass}`;
-          
+
           // 인증 토큰 추가
           const headers = {};
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+            headers["Authorization"] = `Bearer ${token}`;
           }
-          
+
           const response = await fetch(url, { headers });
           if (!response.ok) {
             const data = await response.json();
             throw new Error(data.message || "알림을 가져오는데 실패했습니다.");
           }
-          
+
           let fetchedAlerts = await response.json();
-          
+
+          // 서비스 워커와 알림 데이터 동기화
+          syncAlertsWithServiceWorker(fetchedAlerts);
+
           // 클라이언트 측 필터링 (날짜 및 검색어)
           if (date && date !== "all") {
             const today = new Date();
             const oneDay = 24 * 60 * 60 * 1000; // 하루를 밀리초로 표현
-            
+
             if (date === "today") {
               // 오늘 날짜만 필터링
-              const todayStr = today.toISOString().split('T')[0];
-              fetchedAlerts = fetchedAlerts.filter(alert => {
-                const alertDate = new Date(alert.date).toISOString().split('T')[0];
+              const todayStr = today.toISOString().split("T")[0];
+              fetchedAlerts = fetchedAlerts.filter((alert) => {
+                const alertDate = new Date(alert.date)
+                  .toISOString()
+                  .split("T")[0];
                 return alertDate === todayStr;
               });
             } else if (date === "week") {
               // 이번 주 필터링 (오늘부터 7일)
               const weekLater = new Date(today.getTime() + 7 * oneDay);
-              fetchedAlerts = fetchedAlerts.filter(alert => {
+              fetchedAlerts = fetchedAlerts.filter((alert) => {
                 const alertDate = new Date(alert.date);
                 return alertDate >= today && alertDate <= weekLater;
               });
@@ -856,45 +1416,49 @@
               // 이번 달 필터링
               const currentMonth = today.getMonth();
               const currentYear = today.getFullYear();
-              fetchedAlerts = fetchedAlerts.filter(alert => {
+              fetchedAlerts = fetchedAlerts.filter((alert) => {
                 const alertDate = new Date(alert.date);
-                return alertDate.getMonth() === currentMonth && alertDate.getFullYear() === currentYear;
+                return (
+                  alertDate.getMonth() === currentMonth &&
+                  alertDate.getFullYear() === currentYear
+                );
               });
             }
           }
-          
+
           if (searchTerm) {
-            fetchedAlerts = fetchedAlerts.filter(alert => 
-              alert.title.toLowerCase().includes(searchTerm) || 
-              alert.description.toLowerCase().includes(searchTerm)
+            fetchedAlerts = fetchedAlerts.filter(
+              (alert) =>
+                alert.title.toLowerCase().includes(searchTerm) ||
+                alert.description.toLowerCase().includes(searchTerm)
             );
           }
-          
+
           // 로딩 표시 숨기기
           if (loadingElement) loadingElement.classList.add("hidden");
-          
+
           alerts = fetchedAlerts;
-          
+
           // 페이지네이션 계산
           totalPages = Math.ceil(alerts.length / itemsPerPage);
           if (currentPage > totalPages && totalPages > 0) {
             currentPage = 1;
           }
-          
+
           // 현재 페이지에 해당하는 알림만 표시
           const startIndex = (currentPage - 1) * itemsPerPage;
           const endIndex = Math.min(startIndex + itemsPerPage, alerts.length);
           const currentPageAlerts = alerts.slice(startIndex, endIndex);
-          
+
           renderAlerts(currentPageAlerts);
           renderPagination();
         } catch (error) {
           console.error("알림 가져오기 오류:", error);
-          
+
           // 로딩 표시 숨기기
           const loadingElement = document.getElementById("alerts-loading");
           if (loadingElement) loadingElement.classList.add("hidden");
-          
+
           // 오류 메시지 표시
           const alertsContainer = document.getElementById("alerts-container");
           const errorMessage = document.createElement("div");
@@ -903,25 +1467,27 @@
           alertsContainer.appendChild(errorMessage);
         }
       }
-      
+
       // 필터 적용
-        function applyFilters() {
+      function applyFilters() {
         fetchAlerts();
       }
-      
+
       // 알림 목록 렌더링
       function renderAlerts(alerts) {
         const alertsContainer = document.getElementById("alerts-container");
         const loadingElement = document.getElementById("alerts-loading");
         const noAlertsMessage = document.getElementById("no-alerts-message");
-        
+
         // 로딩 표시 숨기기
         if (loadingElement) loadingElement.classList.add("hidden");
-        
+
         // 기존 알림 카드 제거
-        const existingAlerts = alertsContainer.querySelectorAll(".border.border-gray-200.rounded-md");
-        existingAlerts.forEach(alert => alert.remove());
-        
+        const existingAlerts = alertsContainer.querySelectorAll(
+          ".border.border-gray-200.rounded-md"
+        );
+        existingAlerts.forEach((alert) => alert.remove());
+
         // 알림이 없는 경우
         if (alerts.length === 0) {
           if (noAlertsMessage) noAlertsMessage.classList.remove("hidden");
@@ -929,29 +1495,32 @@
         } else {
           if (noAlertsMessage) noAlertsMessage.classList.add("hidden");
         }
-        
+
         // 알림 카드 추가
-        alerts.forEach(alert => {
+        alerts.forEach((alert) => {
           const alertCard = document.createElement("div");
-          alertCard.className = "border border-gray-200 rounded-md p-4 hover:shadow-md transition cursor-pointer";
+          alertCard.className =
+            "border border-gray-200 rounded-md p-4 hover:shadow-md transition cursor-pointer alert-card";
           alertCard.dataset.id = alert._id;
-          
+
           // 날짜 포맷팅
           const date = new Date(alert.date);
-          const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-          
+          const formattedDate = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
           // 남은 일수 계산
           const today = new Date();
           today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작 시간으로 설정
           const alertDate = new Date(alert.date);
           alertDate.setHours(0, 0, 0, 0); // 알림 날짜의 시작 시간으로 설정
-          
+
           const diffTime = alertDate.getTime() - today.getTime();
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          
+
           let remainingDaysText = "";
           let remainingDaysClass = "text-gray-500";
-          
+
           if (diffDays < 0) {
             remainingDaysText = "마감됨";
             remainingDaysClass = "text-gray-400";
@@ -967,176 +1536,353 @@
               remainingDaysClass = "text-orange-500";
             }
           }
-          
+
           // 작성자 정보 표시
-          const authorText = alert.isAnonymous ? 
-            `<span class="text-gray-500 text-xs ml-2">(${alert.authorName})</span>` : 
-            '';
-          
+          const authorText = alert.authorName
+            ? `<span class="text-gray-500 text-xs ml-2">(${alert.authorName})</span>`
+            : "";
+
+          // 모바일 최적화된 레이아웃
           alertCard.innerHTML = `
-            <div class="flex flex-col md:flex-row md:justify-between md:items-center">
-              <div class="flex items-center mb-2 md:mb-0">
-                <h3 class="font-medium">${alert.title}</h3>
-                ${authorText}
+            <div class="alert-card-mobile">
+              <div class="alert-card-header">
+                <div class="flex items-center">
+                  <h3 class="font-medium">${alert.title}</h3>
+                  ${authorText}
+                </div>
+                <div class="flex items-center text-sm ${remainingDaysClass}">
+                  <i class="far fa-clock mr-1"></i>
+                  <span>${remainingDaysText}</span>
+                </div>
               </div>
-              <div class="flex items-center text-sm text-gray-500">
-                <i class="far fa-calendar-alt mr-1"></i>
-                <span>${formattedDate}</span>
-              </div>
-            </div>
-            <p class="text-gray-600 my-2">${alert.description}</p>
-            <div class="flex flex-wrap justify-between items-center mt-2">
-              <div class="flex items-center text-sm ${remainingDaysClass}">
-                <i class="far fa-clock mr-1"></i>
-                <span>${remainingDaysText}</span>
-              </div>
-              <div class="flex space-x-2 mt-2 md:mt-0">
-                <button class="text-gray-500 text-sm hover:text-primary flex items-center edit-btn" data-id="${alert._id}">
-                  <i class="far fa-edit mr-1"></i> 수정
-                </button>
-                <button class="text-gray-500 text-sm hover:text-danger flex items-center delete-btn" data-id="${alert._id}">
-                  <i class="far fa-trash-alt mr-1"></i> 삭제
-                </button>
-                <button class="text-gray-500 text-sm hover:text-secondary flex items-center share-btn" data-id="${alert._id}">
-                  <i class="far fa-share-square mr-1"></i> 공유
-                </button>
+              <p class="text-gray-600 my-1 alert-card-content">${
+                alert.description
+              }</p>
+              <div class="flex justify-between items-center mt-2">
+                <div class="flex items-center text-sm text-gray-500">
+                  <i class="far fa-calendar-alt mr-1"></i>
+                  <span>${formattedDate}</span>
+                  ${
+                    alert.authorName
+                      ? `<span class="ml-3"><i class="far fa-user mr-1"></i>${alert.authorName}</span>`
+                      : ""
+                  }
+                </div>
+                <div class="flex space-x-2">
+                  <button class="text-gray-500 text-sm hover:text-primary flex items-center edit-btn" data-id="${
+                    alert._id
+                  }">
+                    <i class="far fa-edit mr-1"></i><span class="hidden sm:inline">수정</span>
+                  </button>
+                  <button class="text-gray-500 text-sm hover:text-danger flex items-center delete-btn" data-id="${
+                    alert._id
+                  }">
+                    <i class="far fa-trash-alt mr-1"></i><span class="hidden sm:inline">삭제</span>
+                  </button>
+                  <button class="text-gray-500 text-sm hover:text-secondary flex items-center share-btn" data-id="${
+                    alert._id
+                  }">
+                    <i class="far fa-share-square mr-1"></i><span class="hidden sm:inline">공유</span>
+                  </button>
+                </div>
               </div>
             </div>
           `;
-          
+
           alertsContainer.appendChild(alertCard);
-          
+
           // 알림 카드 클릭 이벤트 (상세 보기 모달 열기)
-          alertCard.addEventListener("click", function(e) {
+          alertCard.addEventListener("click", function (e) {
             // 버튼 클릭은 무시 (버튼에 자체 이벤트 핸들러가 있음)
-            if (e.target.closest('button')) return;
-            
+            if (e.target.closest("button")) return;
+
             openAlertDetailModal(alert);
           });
-          
+
           // 수정 버튼 이벤트
-          const editBtn = alertCard.querySelector(`.edit-btn[data-id="${alert._id}"]`);
-          editBtn.addEventListener("click", function() {
+          const editBtn = alertCard.querySelector(
+            `.edit-btn[data-id="${alert._id}"]`
+          );
+          editBtn.addEventListener("click", function () {
             openEditModal(alert._id);
           });
-          
+
           // 삭제 버튼 이벤트
-          const deleteBtn = alertCard.querySelector(`.delete-btn[data-id="${alert._id}"]`);
-          deleteBtn.addEventListener("click", function() {
+          const deleteBtn = alertCard.querySelector(
+            `.delete-btn[data-id="${alert._id}"]`
+          );
+          deleteBtn.addEventListener("click", function () {
             deleteAlert(alert._id);
           });
-          
+
           // 공유 버튼 이벤트
-          const shareBtn = alertCard.querySelector(`.share-btn[data-id="${alert._id}"]`);
-          shareBtn.addEventListener("click", function() {
-            shareAlert(alert);
+          const shareBtn = alertCard.querySelector(
+            `.share-btn[data-id="${alert._id}"]`
+          );
+          shareBtn.addEventListener("click", function () {
+            openShareModal(alert);
           });
         });
       }
-      
+
       // 알림 상세 보기 모달 열기
       function openAlertDetailModal(alert) {
-        const modal = document.getElementById('alert-detail-modal');
-        const modalTitle = document.getElementById('modal-alert-title');
-        const modalDate = document.getElementById('modal-alert-date');
-        const modalDescription = document.getElementById('modal-alert-description');
-        const modalAuthor = document.getElementById('modal-alert-author');
-        const modalEditBtn = document.getElementById('modal-edit-btn');
-        const modalDeleteBtn = document.getElementById('modal-delete-btn');
-        const modalShareBtn = document.getElementById('modal-share-btn');
-        
+        const modal = document.getElementById("alert-detail-modal");
+        const modalTitle = document.getElementById("modal-alert-title");
+        const modalDate = document.getElementById("modal-alert-date");
+        const modalDescription = document.getElementById(
+          "modal-alert-description"
+        );
+        const modalAuthor = document.getElementById("modal-alert-author");
+        const modalEditBtn = document.getElementById("modal-edit-btn");
+        const modalDeleteBtn = document.getElementById("modal-delete-btn");
+        const modalShareBtn = document.getElementById("modal-share-btn");
+
         // 모달 내용 채우기
         modalTitle.textContent = alert.title;
-        
+
         // 날짜 포맷팅
         const date = new Date(alert.date);
-        const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+        const formattedDate = `${date.getFullYear()}년 ${
+          date.getMonth() + 1
+        }월 ${date.getDate()}일`;
         modalDate.textContent = formattedDate;
-        
+
         // 설명
         modalDescription.textContent = alert.description;
-        
+
         // 작성자 정보
-        if (alert.isAnonymous && alert.authorName) {
+        if (alert.authorName) {
           modalAuthor.textContent = `작성자: ${alert.authorName}`;
         } else {
-          modalAuthor.textContent = '';
+          modalAuthor.textContent = "";
         }
-        
+
         // 버튼 이벤트 설정
-        modalEditBtn.onclick = function() {
-          modal.classList.add('hidden');
+        modalEditBtn.onclick = function () {
+          modal.classList.add("hidden");
           openEditModal(alert._id);
         };
-        
-        modalDeleteBtn.onclick = function() {
-          modal.classList.add('hidden');
+
+        modalDeleteBtn.onclick = function () {
+          modal.classList.add("hidden");
           deleteAlert(alert._id);
         };
-        
-        modalShareBtn.onclick = function() {
-          shareAlert(alert);
+
+        modalShareBtn.onclick = function () {
+          openShareModal(alert);
         };
-        
+
         // 모달 닫기 버튼
-        const closeModalBtn = document.getElementById('close-detail-modal');
-        closeModalBtn.onclick = function() {
-          modal.classList.add('hidden');
+        const closeModalBtn = document.getElementById("close-detail-modal");
+        closeModalBtn.onclick = function () {
+          modal.classList.add("hidden");
         };
-        
+
         // 모달 외부 클릭 시 닫기
-        modal.onclick = function(e) {
+        modal.addEventListener("click", function (e) {
           if (e.target === modal) {
-            modal.classList.add('hidden');
+            modal.classList.add("hidden");
           }
-        };
-        
+        });
+
         // 모달 표시
-        modal.classList.remove('hidden');
+        modal.classList.remove("hidden");
       }
-      
+
       // 알림 공유 기능
       function shareAlert(alert) {
         // 공유할 텍스트 생성
-        const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${new Date(alert.date).toLocaleDateString()}\n내용: ${alert.description}`;
-        
-        // 클립보드에 복사
-        navigator.clipboard.writeText(shareText)
+        const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${new Date(
+          alert.date
+        ).toLocaleDateString()}\n내용: ${alert.description}`;
+
+        // Web Share API 지원 확인
+        if (navigator.share) {
+          navigator
+            .share({
+              title: `수행평가 알리미 - ${alert.title}`,
+              text: shareText,
+              url: window.location.origin + "/alerts.html?view=" + alert._id,
+            })
+            .catch((error) => {
+              console.error("공유 실패:", error);
+              // 공유 실패 시 클립보드 복사로 대체
+              copyToClipboard(shareText);
+            });
+        } else {
+          // Web Share API를 지원하지 않는 경우 클립보드에 복사
+          copyToClipboard(shareText);
+        }
+      }
+
+      // 클립보드에 복사하는 함수
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .writeText(text)
           .then(() => {
             alert("알림 정보가 클립보드에 복사되었습니다.");
           })
-          .catch(err => {
-            console.error('클립보드 복사 실패:', err);
+          .catch((err) => {
+            console.error("클립보드 복사 실패:", err);
             alert("클립보드 복사에 실패했습니다.");
           });
+      }
+
+      // 공유 모달 열기
+      function openShareModal(alert) {
+        const shareModal = document.getElementById("share-modal");
+        const closeShareModalBtn = document.getElementById("close-share-modal");
+        const shareUrl = document.getElementById("share-url");
+        const copyUrlBtn = document.getElementById("copy-url-btn");
+        const shareKakao = document.getElementById("share-kakao");
+        const shareClipboard = document.getElementById("share-clipboard");
+        const shareMessage = document.getElementById("share-message");
+        const shareNative = document.getElementById("share-native");
+
+        // 공유 URL 설정 - 알림 ID를 포함한 URL 생성
+        const url = `${window.location.origin}/alerts.html?view=${alert._id}`;
+        shareUrl.value = url;
+
+        // 공유 텍스트 생성 - 알림 제목, 마감일, 설명 포함
+        const shareText = `[수행평가 알리미] ${alert.title}\n마감일: ${new Date(
+          alert.date
+        ).toLocaleDateString()}\n내용: ${alert.description}`;
+
+        // 이벤트 리스너 중복 방지를 위해 기존 리스너 제거
+        const newCopyUrlBtn = copyUrlBtn.cloneNode(true);
+        copyUrlBtn.parentNode.replaceChild(newCopyUrlBtn, copyUrlBtn);
+
+        const newShareKakao = shareKakao.cloneNode(true);
+        shareKakao.parentNode.replaceChild(newShareKakao, shareKakao);
+
+        const newShareClipboard = shareClipboard.cloneNode(true);
+        shareClipboard.parentNode.replaceChild(
+          newShareClipboard,
+          shareClipboard
+        );
+
+        const newShareMessage = shareMessage.cloneNode(true);
+        shareMessage.parentNode.replaceChild(newShareMessage, shareMessage);
+
+        const newShareNative = shareNative.cloneNode(true);
+        shareNative.parentNode.replaceChild(newShareNative, shareNative);
+
+        // 클립보드 복사 버튼 이벤트
+        newCopyUrlBtn.addEventListener("click", function () {
+          navigator.clipboard
+            .writeText(url)
+            .then(() => {
+              alert("URL이 클립보드에 복사되었습니다.");
+            })
+            .catch((err) => {
+              console.error("URL 복사 실패:", err);
+            });
+        });
+
+        // 카카오톡 공유 - 카카오톡 SDK 사용
+        newShareKakao.addEventListener("click", function () {
+          if (window.Kakao && window.Kakao.isInitialized()) {
+            window.Kakao.Share.sendDefault({
+              objectType: "text",
+              text: shareText,
+              link: {
+                mobileWebUrl: url,
+                webUrl: url,
+              },
+            });
+          } else {
+            alert("카카오톡 공유 기능을 사용할 수 없습니다.");
+            copyToClipboard(shareText);
+          }
+        });
+
+        // 클립보드 복사 - 텍스트 형식으로 알림 정보 복사
+        newShareClipboard.addEventListener("click", function () {
+          copyToClipboard(shareText);
+          shareModal.classList.add("hidden");
+        });
+
+        // 문자 메시지 공유 - SMS 프로토콜 사용
+        newShareMessage.addEventListener("click", function () {
+          const smsUrl = `sms:?body=${encodeURIComponent(shareText)}`;
+          window.location.href = smsUrl;
+        });
+
+        // 기기 네이티브 공유 - Web Share API 사용 (지원하는 브라우저에서만 작동)
+        newShareNative.addEventListener("click", function () {
+          if (navigator.share) {
+            navigator
+              .share({
+                title: `수행평가 알리미 - ${alert.title}`,
+                text: shareText,
+                url: url,
+              })
+              .then(() => {
+                shareModal.classList.add("hidden");
+              })
+              .catch((error) => console.error("공유 실패:", error));
+          } else {
+            alert("이 브라우저에서는 네이티브 공유 기능을 지원하지 않습니다.");
+            copyToClipboard(shareText);
+          }
+        });
+
+        // 모달 닫기 버튼
+        const newCloseShareModalBtn = closeShareModalBtn.cloneNode(true);
+        closeShareModalBtn.parentNode.replaceChild(
+          newCloseShareModalBtn,
+          closeShareModalBtn
+        );
+
+        newCloseShareModalBtn.addEventListener("click", function () {
+          shareModal.classList.add("hidden");
+        });
+
+        // 모달 외부 클릭 시 닫기
+        const modalClickHandler = function (e) {
+          if (e.target === shareModal) {
+            shareModal.classList.add("hidden");
+            shareModal.removeEventListener("click", modalClickHandler);
+          }
+        };
+
+        shareModal.addEventListener("click", modalClickHandler);
+
+        // 모달 표시
+        shareModal.classList.remove("hidden");
       }
 
       // 알림 삭제
       async function deleteAlert(id) {
         if (!confirm("정말로 이 알림을 삭제하시겠습니까?")) return;
-        
+
         try {
           // 헤더 설정
           const headers = {};
-          
+
           // 로그인한 경우 토큰 추가
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem("token");
           if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
+            headers["Authorization"] = `Bearer ${token}`;
           }
-          
+
           const response = await fetch(`${API_BASE_URL}/alerts/${id}`, {
             method: "DELETE",
-            headers
+            headers,
           });
-          
+
           if (!response.ok) {
             const data = await response.json();
             throw new Error(data.message || "알림 삭제에 실패했습니다.");
           }
-          
+
           // 성공 시 목록 새로고침
           fetchAlerts();
+
+          // 지속적인 알림 업데이트
+          updatePersistentNotification();
+
           alert("알림이 성공적으로 삭제되었습니다.");
         } catch (error) {
           console.error("알림 삭제 오류:", error);
@@ -1146,19 +1892,22 @@
 
       // 페이지네이션 렌더링
       function renderPagination() {
-        const paginationContainer = document.getElementById("pagination-container");
+        const paginationContainer = document.getElementById(
+          "pagination-container"
+        );
         paginationContainer.innerHTML = "";
-        
+
         if (totalPages <= 1) {
           return; // 페이지가 1개 이하면 페이지네이션 표시 안 함
         }
-        
+
         // 이전 버튼
         const prevButton = document.createElement("a");
         prevButton.href = "#";
-        prevButton.className = "px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+        prevButton.className =
+          "px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
         prevButton.textContent = "이전";
-        prevButton.addEventListener("click", function(e) {
+        prevButton.addEventListener("click", function (e) {
           e.preventDefault();
           if (currentPage > 1) {
             currentPage--;
@@ -1166,88 +1915,98 @@
           }
         });
         paginationContainer.appendChild(prevButton);
-        
+
         // 페이지 버튼 생성
         const maxVisiblePages = 5; // 한 번에 표시할 최대 페이지 버튼 수
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let startPage = Math.max(
+          1,
+          currentPage - Math.floor(maxVisiblePages / 2)
+        );
         let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        
+
         // 시작 페이지 조정
         if (endPage - startPage + 1 < maxVisiblePages) {
           startPage = Math.max(1, endPage - maxVisiblePages + 1);
         }
-        
+
         // 첫 페이지로 이동 버튼 (필요한 경우)
         if (startPage > 1) {
           const firstPageButton = document.createElement("a");
           firstPageButton.href = "#";
-          firstPageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+          firstPageButton.className =
+            "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
           firstPageButton.textContent = "1";
-          firstPageButton.addEventListener("click", function(e) {
+          firstPageButton.addEventListener("click", function (e) {
             e.preventDefault();
             currentPage = 1;
             fetchAlerts();
           });
           paginationContainer.appendChild(firstPageButton);
-          
+
           // 생략 표시 (필요한 경우)
           if (startPage > 2) {
             const ellipsis = document.createElement("span");
-            ellipsis.className = "px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500";
+            ellipsis.className =
+              "px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500";
             ellipsis.textContent = "...";
             paginationContainer.appendChild(ellipsis);
           }
         }
-        
+
         // 페이지 버튼
         for (let i = startPage; i <= endPage; i++) {
           const pageButton = document.createElement("a");
           pageButton.href = "#";
           pageButton.textContent = i;
-          
+
           if (i === currentPage) {
-            pageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-primary text-white";
+            pageButton.className =
+              "px-3 py-2 border-t border-b border-l border-gray-300 bg-primary text-white";
           } else {
-            pageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+            pageButton.className =
+              "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
           }
-          
-          pageButton.addEventListener("click", function(e) {
+
+          pageButton.addEventListener("click", function (e) {
             e.preventDefault();
             currentPage = i;
             fetchAlerts();
           });
-          
+
           paginationContainer.appendChild(pageButton);
         }
-        
+
         // 마지막 페이지로 이동 버튼 (필요한 경우)
         if (endPage < totalPages) {
           // 생략 표시 (필요한 경우)
           if (endPage < totalPages - 1) {
             const ellipsis = document.createElement("span");
-            ellipsis.className = "px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500";
+            ellipsis.className =
+              "px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500";
             ellipsis.textContent = "...";
             paginationContainer.appendChild(ellipsis);
           }
-          
+
           const lastPageButton = document.createElement("a");
           lastPageButton.href = "#";
-          lastPageButton.className = "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+          lastPageButton.className =
+            "px-3 py-2 border-t border-b border-l border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
           lastPageButton.textContent = totalPages;
-          lastPageButton.addEventListener("click", function(e) {
+          lastPageButton.addEventListener("click", function (e) {
             e.preventDefault();
             currentPage = totalPages;
             fetchAlerts();
           });
           paginationContainer.appendChild(lastPageButton);
         }
-        
+
         // 다음 버튼
         const nextButton = document.createElement("a");
         nextButton.href = "#";
-        nextButton.className = "px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
+        nextButton.className =
+          "px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50";
         nextButton.textContent = "다음";
-        nextButton.addEventListener("click", function(e) {
+        nextButton.addEventListener("click", function (e) {
           e.preventDefault();
           if (currentPage < totalPages) {
             currentPage++;
@@ -1256,12 +2015,285 @@
         });
         paginationContainer.appendChild(nextButton);
       }
-      
+
       // 페이지 변경 함수
       function changePage(page) {
         if (page >= 1 && page <= totalPages) {
           currentPage = page;
           fetchAlerts();
+        }
+      }
+
+      // 공유된 알림 가져와서 표시
+      async function fetchAndShowSharedAlert(alertId) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/alerts/${alertId}`);
+
+          if (!response.ok) {
+            throw new Error("알림을 찾을 수 없습니다.");
+          }
+
+          const alert = await response.json();
+
+          // 알림 상세 모달 열기
+          openAlertDetailModal(alert);
+
+          // 학교/학년/반 정보 업데이트 (필요한 경우)
+          if (!selectedSchool || !selectedGrade || !selectedClass) {
+            selectedSchool = alert.school;
+            selectedGrade = alert.grade;
+            selectedClass = alert.class;
+
+            // 로컬 스토리지에 저장
+            localStorage.setItem(
+              "schoolSelection",
+              JSON.stringify({
+                school: selectedSchool,
+                grade: selectedGrade,
+                class: selectedClass,
+              })
+            );
+
+            // 알림 목록 새로고침
+            fetchAlerts();
+          }
+        } catch (error) {
+          console.error("공유된 알림 가져오기 오류:", error);
+          alert("공유된 알림을 불러올 수 없습니다.");
+        }
+      }
+
+      // 푸시 알림 구독 버튼 설정
+      function setupPushNotificationButtons() {
+        const subscribeButton = document.getElementById(
+          "push-subscribe-button"
+        );
+        const unsubscribeButton = document.getElementById(
+          "push-unsubscribe-button"
+        );
+        const pushStatus = document.getElementById("push-status");
+
+        if (subscribeButton) {
+          subscribeButton.addEventListener("click", async function () {
+            try {
+              await subscribeToPushNotifications();
+              updatePushButtons(true);
+              pushStatus.textContent = "알림 구독이 완료되었습니다.";
+              pushStatus.className = "text-sm text-green-600 mt-2";
+            } catch (error) {
+              console.error("푸시 알림 구독 오류:", error);
+              pushStatus.textContent = `오류: ${
+                error.message || "알림 구독 중 오류가 발생했습니다."
+              }`;
+              pushStatus.className = "text-sm text-red-600 mt-2";
+            }
+          });
+        }
+
+        if (unsubscribeButton) {
+          unsubscribeButton.addEventListener("click", async function () {
+            try {
+              await unsubscribeFromPushNotifications();
+              updatePushButtons(false);
+              pushStatus.textContent = "알림 구독이 취소되었습니다.";
+              pushStatus.className = "text-sm text-gray-600 mt-2";
+            } catch (error) {
+              console.error("푸시 알림 구독 취소 오류:", error);
+              pushStatus.textContent = `오류: ${
+                error.message || "알림 구독 취소 중 오류가 발생했습니다."
+              }`;
+              pushStatus.className = "text-sm text-red-600 mt-2";
+            }
+          });
+        }
+      }
+
+      // 푸시 알림 구독 상태 확인
+      async function checkPushSubscription() {
+        try {
+          if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+            document.getElementById("push-status").textContent =
+              "이 브라우저는 푸시 알림을 지원하지 않습니다.";
+            document.getElementById("push-subscribe-button").disabled = true;
+            return;
+          }
+
+          const registration = await navigator.serviceWorker.ready;
+          const subscription = await registration.pushManager.getSubscription();
+
+          if (subscription) {
+            pushSubscription = subscription;
+            updatePushButtons(true);
+          } else {
+            updatePushButtons(false);
+          }
+        } catch (error) {
+          console.error("푸시 구독 상태 확인 오류:", error);
+        }
+      }
+
+      // 푸시 알림 구독 버튼 업데이트
+      function updatePushButtons(isSubscribed) {
+        const subscribeButton = document.getElementById(
+          "push-subscribe-button"
+        );
+        const unsubscribeButton = document.getElementById(
+          "push-unsubscribe-button"
+        );
+
+        if (isSubscribed) {
+          subscribeButton.classList.add("hidden");
+          unsubscribeButton.classList.remove("hidden");
+        } else {
+          subscribeButton.classList.remove("hidden");
+          unsubscribeButton.classList.add("hidden");
+        }
+      }
+
+      // 푸시 알림 구독
+      async function subscribeToPushNotifications() {
+        try {
+          if (!isLoggedIn) {
+            throw new Error("로그인이 필요합니다.");
+          }
+
+          if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+            throw new Error("이 브라우저는 푸시 알림을 지원하지 않습니다.");
+          }
+
+          // VAPID 공개 키 가져오기
+          const response = await fetch(`${API_BASE_URL}/push/vapidPublicKey`);
+          const data = await response.json();
+          const vapidPublicKey = data.vapidPublicKey;
+
+          // 서비스 워커 등록 확인
+          const registration = await navigator.serviceWorker.ready;
+
+          // 이미 구독 중인지 확인
+          let subscription = await registration.pushManager.getSubscription();
+
+          if (subscription) {
+            // 이미 구독 중이면 기존 구독 반환
+            pushSubscription = subscription;
+            return subscription;
+          }
+
+          // 구독 옵션 설정
+          const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+
+          // 새 구독 생성
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey,
+          });
+
+          // 서버에 구독 정보 전송
+          const token = localStorage.getItem("token");
+
+          const subscribeResponse = await fetch(
+            `${API_BASE_URL}/push/subscribe`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(subscription),
+            }
+          );
+
+          if (!subscribeResponse.ok) {
+            const errorData = await subscribeResponse.json();
+            throw new Error(
+              errorData.message || "구독 처리 중 오류가 발생했습니다."
+            );
+          }
+
+          pushSubscription = subscription;
+          return subscription;
+        } catch (error) {
+          console.error("푸시 알림 구독 오류:", error);
+          throw error;
+        }
+      }
+
+      // 푸시 알림 구독 취소
+      async function unsubscribeFromPushNotifications() {
+        try {
+          if (!isLoggedIn) {
+            throw new Error("로그인이 필요합니다.");
+          }
+
+          if (!pushSubscription) {
+            const registration = await navigator.serviceWorker.ready;
+            pushSubscription = await registration.pushManager.getSubscription();
+
+            if (!pushSubscription) {
+              throw new Error("구독 정보를 찾을 수 없습니다.");
+            }
+          }
+
+          // 서버에 구독 취소 요청
+          const token = localStorage.getItem("token");
+
+          const unsubscribeResponse = await fetch(
+            `${API_BASE_URL}/push/unsubscribe`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                endpoint: pushSubscription.endpoint,
+              }),
+            }
+          );
+
+          if (!unsubscribeResponse.ok) {
+            const errorData = await unsubscribeResponse.json();
+            throw new Error(
+              errorData.message || "구독 취소 중 오류가 발생했습니다."
+            );
+          }
+
+          // 브라우저에서 구독 취소
+          await pushSubscription.unsubscribe();
+          pushSubscription = null;
+
+          return true;
+        } catch (error) {
+          console.error("푸시 알림 구독 취소 오류:", error);
+          throw error;
+        }
+      }
+
+      // Base64 URL을 Uint8Array로 변환 (VAPID 키 처리용)
+      function urlBase64ToUint8Array(base64String) {
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding)
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
+
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+          outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+      }
+
+      // 서비스 워커와 알림 데이터 동기화
+      function syncAlertsWithServiceWorker(alerts) {
+        if (
+          "serviceWorker" in navigator &&
+          navigator.serviceWorker.controller
+        ) {
+          navigator.serviceWorker.controller.postMessage({
+            action: "SYNC_ALERTS",
+            alerts: alerts,
+          });
         }
       }
     </script>
